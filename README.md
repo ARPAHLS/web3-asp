@@ -148,13 +148,17 @@ Want more features? Add API keys for better performance:
 - 🔴 **Red**: Danger - Known scam, honeypot, or sanctioned entity
 - 🟣 **Purple**: Addressbook - Your saved trusted address with custom tag
 
+<p align="center">
+  <img src="icons/saved.png" alt="Saved Address">
+</p>
+
 ---
 
 ## ⚙️ Configuration
 
 ### 🎯 Default Configuration (No Changes Needed!)
 
-H3 Aspis works out of the box with:
+Web3 ASP works out of the box with:
 
 ```javascript
 rpc: {
@@ -485,5 +489,6 @@ Contributions welcome! Please:
 | **0.1.0** | Oct 24, 2025 | Initial release with GoPlus & AI |
 
 **See `UPDATE_NOTES.md` for complete changelog**
+
 
 
