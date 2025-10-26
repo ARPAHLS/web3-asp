@@ -9,6 +9,9 @@ Web3 ASP (H3 Aspis) is a Chrome extension that provides real-time security analy
 <p align="center">
   <img src="icons/logo300x100.png" alt="H3 Aspis Logo" width="300" height="100">
 </p>
+<p align="center">
+  <img src="icons/asp-es1.png" alt="Etherscan Example">
+</p>
 
 ---
 
@@ -123,12 +126,6 @@ Want more features? Add API keys for better performance:
 <p align="center">
   <img src="icons/asp-tg.png" alt="Telegram Message Example">
 </p>
-<p align="center">
-  <img src="icons/asp-es1.png" alt="Etherscan Example">
-</p>
-<p align="center">
-  <img src="icons/sample4.png" alt="PopUp Sample">
-</p>
 
 ### Manual Scanning
 1. Click the H3 Aspis icon in your toolbar
@@ -142,6 +139,10 @@ Want more features? Add API keys for better performance:
 3. Use time filters (all, today, week, month) to browse past scans
 4. Use filter pills (threats, warnings, safe, info) to filter by status
 5. Click any entry to see full analysis details
+
+<p align="center">
+  <img src="icons/sample3.png" alt="PopUp Sample">
+</p>
 
 ### Understanding Risk Colors
 - 🟢 **Green**: Safe - Verified contract or established wallet
@@ -487,6 +488,7 @@ Contributions welcome! Please:
 | **0.1.0** | Oct 24, 2025 | Initial release with GoPlus & AI |
 
 **See `UPDATE_NOTES.md` for complete changelog**
+
 
 
 
