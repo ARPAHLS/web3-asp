@@ -77,7 +77,7 @@ H3 Aspis is a Chrome extension that provides real-time security analysis of smar
    - Open `chrome://extensions/`
    - Enable "Developer mode" (top right)
    - Click "Load unpacked"
-   - Select the `H3_Aspis_Chrome_Extension` folder
+   - Select the `web3-asp` folder
    - Pin the extension to your toolbar
 
 6. **Enable Chrome AI**
@@ -92,13 +92,13 @@ H3 Aspis is a Chrome extension that provides real-time security analysis of smar
 ## 🚀 Usage
 
 ### Automatic Scanning
-1. Visit any Web3 site (e.g., Etherscan, Uniswap, OpenSea)
+1. Visit any Web3 site (e.g., Etherscan, Uniswap, OpenSea, Articles)
 2. H3 Aspis automatically detects and highlights addresses
 3. Hover over highlighted addresses for quick risk info
 4. Click a highlighted address to see full analysis
 
 ### Manual Scanning
-1. Click the H3 Aspis icon in your toolbar
+1. Click the Web3 ASP icon in your toolbar
 2. Go to the "Scan" tab
 3. Paste any Ethereum/Base/Polygon address
 4. Click "Analyze" to see detailed security report
@@ -329,8 +329,8 @@ Contributions welcome! Please:
 ## 📞 Support
 
 - **Documentation**: See `/docs` folder
-- **Issues**: [GitHub Issues](https://github.com/your-repo/issues)
-- **Email**: support@h3aspis.com
+- **Issues**: [GitHub Issues](https://github.com/web3-asp/issues)
+- **Email**: support@arpacorp.net
 
 ---
 
@@ -359,7 +359,7 @@ Contributions welcome! Please:
 ## 🙏 Acknowledgments
 
 - Built with [Chrome Built-in AI (Gemini Nano)](https://developer.chrome.com/docs/ai/built-in)
-- Powered by [ARPA Wallet Screening](https://arpa.systems) datasets
+- Powered by [ARPA Hellenic Logical Systems](https://arpa.systems)
 - Inspired by the Web3 security community
 
 ---
@@ -375,10 +375,11 @@ Contributions welcome! Please:
 | Version | Date | Highlights |
 |---------|------|------------|
 | **0.3.2** | Oct 24, 2025 | Documentation cleanup, finalized security strategy |
-| **0.3.1** | Oct 24, 2025 | Sanctions database rebuild (36 addresses) |
+| **0.3.1** | Oct 24, 2025 | Sanctions database rebuild (36 Eth + thousands EVM + Bitcoin addresses) |
 | **0.3.0** | Oct 24, 2025 | Addressbook & audit trail UI complete |
 | **0.2.0** | Oct 24, 2025 | Multi-address support, sequential analysis |
 | **0.1.0** | Oct 24, 2025 | Initial release with GoPlus & AI |
 
 **See `UPDATE_NOTES.md` for complete changelog**
+
 
