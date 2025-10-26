@@ -6,7 +6,7 @@ Get Web3 ASP running in under 5 minutes with zero API keys!
 
 ## ⚡ Minimal Setup (No API Keys Required)
 
-Perfect for hackathons, demos, and testing. Works 100% offline!
+Works 100% offline!
 
 ### Step 1: Copy Config Files
 
@@ -254,7 +254,7 @@ For cross-device history and settings sync:
 
 ## 💡 Pro Tips
 
-1. **Demo Mode** is perfect for hackathons - all features unlocked, no paywalls!
+1. **Demo Mode** All features unlocked, no paywalls!
 2. **Public RPCs** work great for testing, but consider private RPCs for production
 3. **Chrome AI** is optional but adds amazing context to security findings
 4. **Firebase** is completely optional - extension works 100% offline
@@ -279,4 +279,5 @@ For cross-device history and settings sync:
 **Ready to go? Load the extension and start scanning!** 🛡️
 
 Questions? Check the main **[README.md](README.md)** or open an issue at **[github.com/arpahls/web3-asp/issues](https://github.com/arpahls/web3-asp/issues)**.
+
 
