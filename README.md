@@ -1,4 +1,4 @@
-# H3 Aspis: Web3 Security Companion
+# Web3 ASP: Agentic Security Protocol
 
 > Privacy-first Web3 security analysis powered by on-device AI and real-time threat intelligence
 
@@ -485,6 +485,7 @@ Contributions welcome! Please:
 | **0.1.0** | Oct 24, 2025 | Initial release with GoPlus & AI |
 
 **See `UPDATE_NOTES.md` for complete changelog**
+
 
 
 
