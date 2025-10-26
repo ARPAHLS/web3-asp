@@ -9,9 +9,6 @@ Web3 ASP (H3 Aspis) is a Chrome extension that provides real-time security analy
 <p align="center">
   <img src="icons/logo300x100.png" alt="H3 Aspis Logo" width="300" height="100">
 </p>
-<p align="center">
-  <img src="icons/asp-es1.png" alt="Etherscan Example">
-</p>
 
 ---
 
@@ -488,6 +485,7 @@ Contributions welcome! Please:
 | **0.1.0** | Oct 24, 2025 | Initial release with GoPlus & AI |
 
 **See `UPDATE_NOTES.md` for complete changelog**
+
 
 
 
