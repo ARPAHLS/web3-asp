@@ -70,7 +70,7 @@ Web3 ASP (H3 Aspis) is a Chrome extension that provides real-time security analy
    - Open `chrome://extensions/`
    - Enable "Developer mode" (top right)
    - Click "Load unpacked"
-   - Select the `H3_Aspis_Chrome_Extension` folder
+   - Select the `Web3-ASP` folder
    - Pin the extension to your toolbar
 
 4. **Enable Chrome AI** (Optional but Recommended)
@@ -116,7 +116,7 @@ Want more features? Add API keys for better performance:
 
 ### Automatic Scanning
 1. Visit any web page (e.g., Etherscan, Twitter, Telegram, Uniswap)
-2. H3 Aspis automatically detects and highlights addresses
+2. Web3 ASP automatically detects and highlights addresses
 3. Hover over highlighted addresses for quick risk info
 4. Click a highlighted address to see full analysis
 
@@ -125,13 +125,13 @@ Want more features? Add API keys for better performance:
 </p>
 
 ### Manual Scanning
-1. Click the H3 Aspis icon in your toolbar
+1. Click the Web3 ASP icon in your toolbar
 2. Go to the "Scan" tab
 3. Paste any Ethereum/Base/Polygon address
 4. Click "Analyze" to see detailed security report
 
 ### Viewing History
-1. Click the H3 Aspis icon in your toolbar
+1. Click the Web3 ASP icon in your toolbar
 2. Go to the "History" tab
 3. Use time filters (all, today, week, month) to browse past scans
 4. Use filter pills (threats, warnings, safe, info) to filter by status
@@ -172,7 +172,7 @@ features: {
 }
 ```
 
-**Perfect for**: Hackathons, demos, testing, personal use
+**Perfect for**: Personal use, and professional offline and online use.
 
 ### 🚀 Custom RPC Endpoints (Optional)
 
@@ -273,7 +273,7 @@ For complete configuration options, see:
 ### Component Overview
 
 ```
-H3_Aspis_Chrome_Extension/
+Web3-ASP/
 ├── manifest.json              # Extension configuration
 ├── background.js              # Service worker (analysis orchestrator)
 ├── content.js                 # Page scanner & highlighter
@@ -388,7 +388,7 @@ Content Script Highlights Address
 
 ## 🔒 Security & Privacy
 
-### What H3 Aspis Does:
+### What Web3 ASP Does:
 - ✅ Analyzes addresses **on your device**
 - ✅ Stores sanctions lists **locally**
 - ✅ Only sends data to Firebase if you sign in and enable history
@@ -455,7 +455,7 @@ Contributions welcome! Please:
 ## 🙏 Acknowledgments
 
 - Built with [Chrome Built-in AI (Gemini Nano)](https://developer.chrome.com/docs/ai/built-in)
-- Powered by [ARPA Wallet Screening](https://arpa.systems) datasets
+- Powered by [ARPA Hellenic Logical Systems](https://arpa.systems)
 - Inspired by the Web3 security community
 
 ---
@@ -485,10 +485,5 @@ Contributions welcome! Please:
 | **0.1.0** | Oct 24, 2025 | Initial release with GoPlus & AI |
 
 **See `UPDATE_NOTES.md` for complete changelog**
-
-
-
-
-
 
 
