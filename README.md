@@ -115,13 +115,13 @@ Want more features? Add API keys for better performance:
 ## 🚀 Usage
 
 ### Automatic Scanning
-1. Visit any Web3 site (e.g., Etherscan, Uniswap, OpenSea)
+1. Visit any web page (e.g., Etherscan, Twitter, Telegram, Uniswap)
 2. H3 Aspis automatically detects and highlights addresses
 3. Hover over highlighted addresses for quick risk info
 4. Click a highlighted address to see full analysis
 
 <p align="center">
-  <img src="icons/asp-tg.png" alt="Telegram Message Example">
+  <img src="icons/asp-es2.png" alt="Telegram Message Example">
 </p>
 
 ### Manual Scanning
@@ -485,6 +485,7 @@ Contributions welcome! Please:
 | **0.1.0** | Oct 24, 2025 | Initial release with GoPlus & AI |
 
 **See `UPDATE_NOTES.md` for complete changelog**
+
 
 
 
