@@ -235,30 +235,35 @@ export function createFallbackAnalysis(address, type, sanctionsHit = false) {
       reason: 'This address has been identified on a sanctions or malicious actors list.',
       flags: ['sanctions_list'],
       confidence: 1.0,
-      tooltip: 'CRITICAL: This address is on a sanctions list. Avoid all interactions.'
+      tooltip: 'CRITICAL: This address is on a sanctions list. Avoid all interactions.',
+      type: type
     };
   }
   
+  // Contracts without GoPlus data should be YELLOW (unknown, proceed with caution)
   if (type === 'contract') {
     return {
-      status: 'blue',
+      status: 'yellow',
       riskLevel: 'unknown',
-      summary: 'Smart contract detected',
-      reason: 'This is a smart contract. Exercise caution and verify the contract before interacting.',
-      flags: ['contract'],
+      summary: 'Smart contract - security unknown',
+      reason: 'This is a smart contract. Security analysis unavailable. Exercise caution and verify before interacting.',
+      flags: ['contract', 'no_security_data'],
       confidence: 0.5,
-      tooltip: 'Smart Contract - Review before interacting'
+      tooltip: 'Smart Contract - Security unknown, proceed with caution',
+      type: 'contract'
     };
   }
   
+  // Wallets that are NOT on sanctions list are BLUE (informational/neutral)
   return {
     status: 'blue',
-    riskLevel: 'unknown',
-    summary: 'Wallet address detected',
-    reason: 'Standard wallet address. No immediate risk indicators.',
+    riskLevel: 'info',
+    summary: 'Standard wallet address',
+    reason: 'Standard wallet address (EOA). No sanctions match detected.',
     flags: ['wallet'],
-    confidence: 0.5,
-    tooltip: 'Wallet Address - Standard EOA'
+    confidence: 0.8,
+    tooltip: 'Wallet Address - No issues detected',
+    type: 'wallet'
   };
 }
 

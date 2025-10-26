@@ -13,12 +13,19 @@ export async function getTokenSecurity(address, chainId = '1') {
   try {
     const url = `${GOPLUS_API_BASE}/token_security/${chainId}?contract_addresses=${address.toLowerCase()}`;
     
+    // Add 10 second timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    
     const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Accept': 'application/json'
-      }
+      },
+      signal: controller.signal
     });
+    
+    clearTimeout(timeoutId);
     
     if (!response.ok) {
       throw new Error(`GoPlus API error: ${response.status}`);
