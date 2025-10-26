@@ -52,13 +52,13 @@
 
 /* Blue - Informational/Contract */
 .h3-aspis-blue {
-  background-color: rgba(216, 191, 216, 0.15);
-  border-bottom: 2px solid rgba(168, 141, 255, 0.6);
-  color: #4a3a7a;
+  background-color: rgba(173, 216, 230, 0.15);
+  border-bottom: 2px solid rgba(30, 144, 255, 0.5);
+  color: #1e5a9e;
 }
 
 .h3-aspis-blue:hover {
-  background-color: rgba(216, 191, 216, 0.25);
+  background-color: rgba(173, 216, 230, 0.25);
 }
 
 /* Loading State - Light grey with pulsating animation */
@@ -80,14 +80,16 @@
 }
 
 /* Addressbook Entry - Purple highlight */
-.h3-aspis-addressbook {
+.h3-aspis-addressbook,
+.h3-aspis-purple {
   background-color: rgba(216, 191, 216, 0.2);
   border-bottom: 2px solid rgba(186, 85, 211, 0.6);
   color: #8b7ba8;
   font-weight: 600;
 }
 
-.h3-aspis-addressbook:hover {
+.h3-aspis-addressbook:hover,
+.h3-aspis-purple:hover {
   background-color: rgba(216, 191, 216, 0.3);
 }
 

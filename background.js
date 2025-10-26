@@ -5,6 +5,7 @@ import { isValidAddress, isContract, getTransactionCount, getBalance, getContrac
 import { createAnalysisPrompt, parseAIResponse, applyTierGating, createFallbackAnalysis } from './utils/analyzer.js';
 import { checkSanctionedWallet, getSanctionsStats } from './data/sanctioned-wallets.js';
 import { getTokenSecurity, getChainId } from './utils/goplus-security.js';
+import { getTestAddressData } from './data/test-addresses.js';
 
 console.log('[H3 Aspis] Background service worker starting...');
 
@@ -109,34 +110,52 @@ async function loadConfiguration() {
 
 /**
  * Check if Chrome AI (Gemini Nano) is available
+ * NOTE: Gemini Nano is BUILT-IN to Chrome - NO API KEY needed!
  */
 async function checkAIAvailability() {
   try {
+    console.log('[H3 Aspis] Checking Chrome Built-in AI (Gemini Nano)...');
+    console.log('[H3 Aspis] Note: No API key needed - Gemini Nano runs on your device!');
+    
     if (typeof chrome.ai === 'undefined' || !chrome.ai.promptApi) {
-      console.warn('[H3 Aspis] Chrome AI API not available');
+      console.warn('[H3 Aspis] ❌ Chrome AI API not available');
+      console.warn('[H3 Aspis] Are you using Chrome Canary/Dev with flags enabled?');
+      console.warn('[H3 Aspis] See GEMINI_NANO_SETUP.md for instructions');
       CONFIG.features.enableAI = false;
       return false;
     }
     
-    // Check if we can create a session
+    // Check capabilities
     const capabilities = await chrome.ai.promptApi.capabilities();
+    console.log('[H3 Aspis] AI Capabilities:', capabilities);
     
     if (capabilities.available === 'no') {
-      console.warn('[H3 Aspis] Gemini Nano not available on this device');
+      console.warn('[H3 Aspis] ❌ Gemini Nano not available on this device');
+      console.warn('[H3 Aspis] Requirements: Chrome 127+, Modern CPU, 4GB+ RAM');
       CONFIG.features.enableAI = false;
       return false;
     }
     
     if (capabilities.available === 'after-download') {
-      console.log('[H3 Aspis] Gemini Nano available after download');
-      // In production, we'd prompt the user to download
+      console.log('[H3 Aspis] ⏳ Gemini Nano model needs to download');
+      console.log('[H3 Aspis] Go to chrome://components/ and update "Optimization Guide On Device Model"');
+      console.log('[H3 Aspis] Download size: ~1.5GB, may take 5-10 minutes');
+      CONFIG.features.enableAI = false; // Disable until downloaded
+      return false;
     }
     
-    console.log('[H3 Aspis] Gemini Nano available:', capabilities);
+    if (capabilities.available === 'readily') {
+      console.log('[H3 Aspis] ✅ Gemini Nano is ready!');
+      console.log('[H3 Aspis] AI-powered analysis enabled');
+      return true;
+    }
+    
+    console.log('[H3 Aspis] ✅ Gemini Nano available');
     return true;
     
   } catch (error) {
-    console.error('[H3 Aspis] Error checking AI availability:', error);
+    console.error('[H3 Aspis] ❌ Error checking AI availability:', error);
+    console.error('[H3 Aspis] Extension will work with fallback analysis (GoPlus + basic rules)');
     CONFIG.features.enableAI = false;
     return false;
   }
@@ -371,26 +390,34 @@ async function analyzeAddress(address) {
  * @returns {Promise<Object>}
  */
 async function performAnalysis(address) {
-  console.log('[H3 Aspis] Analyzing:', address);
+  console.log('[H3 Aspis] ========== Starting Analysis for', address, '==========');
   
-  // Step 1: Check sanctioned wallets database
-  const sanctionsCheck = CONFIG.features.enableSanctionsCheck ? 
-    checkSanctionedWallet(address) : null;
-  
-  if (sanctionsCheck) {
-    console.log('[H3 Aspis] SANCTIONS HIT:', sanctionsCheck.name);
-    return {
-      status: 'red',
-      riskLevel: 'critical',
-      summary: `🚫 ${sanctionsCheck.name}`,
-      reason: sanctionsCheck.reason,
-      tooltip: `CRITICAL: ${sanctionsCheck.name} - ${sanctionsCheck.source}`,
-      flags: ['sanctions', sanctionsCheck.type, ...sanctionsCheck.tags],
-      confidence: 1.0,
-      type: sanctionsCheck.type,
-      sanctionsData: sanctionsCheck
-    };
-  }
+  try {
+    // Step 0: Check test dataset first (for demo/testing)
+    const testData = getTestAddressData(address);
+    if (testData) {
+      console.log('[H3 Aspis] 🧪 TEST ADDRESS MATCH:', testData.summary);
+      return testData;
+    }
+    
+    // Step 1: Check sanctioned wallets database
+    const sanctionsCheck = CONFIG.features.enableSanctionsCheck ? 
+      checkSanctionedWallet(address) : null;
+    
+    if (sanctionsCheck) {
+      console.log('[H3 Aspis] ⚠️ SANCTIONS HIT:', sanctionsCheck.name);
+      return {
+        status: 'red',
+        riskLevel: 'critical',
+        summary: `🚫 ${sanctionsCheck.name}`,
+        reason: sanctionsCheck.reason,
+        tooltip: `CRITICAL: ${sanctionsCheck.name} - ${sanctionsCheck.source}`,
+        flags: ['sanctions', sanctionsCheck.type, ...sanctionsCheck.tags],
+        confidence: 1.0,
+        type: sanctionsCheck.type || 'wallet',
+        sanctionsData: sanctionsCheck
+      };
+    }
   
   // Step 2: Determine if contract or wallet
   const rpcUrl = CONFIG.rpc.ethereum; // Default to Ethereum
@@ -399,17 +426,29 @@ async function performAnalysis(address) {
   
   console.log('[H3 Aspis] Address type:', type, '| Code:', contractCheck.code ? contractCheck.code.substring(0, 20) + '...' : 'none');
   
-  // Step 3: Gather additional data
-  const [txCount, balance] = await Promise.all([
-    getTransactionCount(address, rpcUrl),
-    getBalance(address, rpcUrl)
-  ]);
+  // Quick return for regular wallets (not in sanctions = safe/blue)
+  if (type === 'wallet') {
+    console.log('[H3 Aspis] Regular wallet, no sanctions found - returning BLUE');
+    return {
+      status: 'blue',
+      riskLevel: 'info',
+      summary: 'Standard wallet address (EOA). No sanctions match detected.',
+      reason: 'External Owned Account with no red flags',
+      flags: ['wallet'],
+      confidence: 0.8,
+      tooltip: 'Wallet - No threats detected',
+      type: 'wallet'
+    };
+  }
+  
+  // For contracts, continue with deeper analysis
+  console.log('[H3 Aspis] Contract detected, continuing with security analysis...');
   
   let contractData = null;
   let goPlusData = null;
   
   // Get contract source if available
-  if (type === 'contract' && CONFIG.explorers.ethereum.key) {
+  if (CONFIG.explorers.ethereum.key) {
     contractData = await getContractSource(
       address,
       CONFIG.explorers.ethereum.api,
@@ -420,29 +459,35 @@ async function performAnalysis(address) {
   // Step 3.5: GoPlus Security Check (for contracts/tokens)
   if (type === 'contract' && CONFIG.features.enableGoPlus) {
     try {
+      console.log('[H3 Aspis] Calling GoPlus API for contract analysis...');
       const chainId = getChainId('ethereum'); // Default to Ethereum
       goPlusData = await getTokenSecurity(address, chainId);
       
       if (goPlusData) {
-        console.log('[H3 Aspis] GoPlus analysis:', goPlusData.status);
+        console.log('[H3 Aspis] GoPlus analysis complete:', goPlusData.status, '/', goPlusData.riskLevel);
         
         // If GoPlus found critical issues, return immediately
         if (goPlusData.status === 'red' && goPlusData.riskLevel === 'critical') {
+          console.log('[H3 Aspis] CRITICAL ISSUE from GoPlus, returning immediately');
           return {
             ...goPlusData,
             type: 'contract',
             tooltip: goPlusData.summary
           };
         }
+      } else {
+        console.log('[H3 Aspis] GoPlus returned no data for this contract');
       }
     } catch (error) {
       console.warn('[H3 Aspis] GoPlus check failed:', error);
+      // Continue to fallback - don't leave stuck
     }
   }
   
   // Step 4: AI Analysis (if available)
   if (CONFIG.features.enableAI) {
     try {
+      console.log('[H3 Aspis] Attempting AI analysis...');
       const aiAnalysis = await runAIAnalysis({
         address,
         type,
@@ -453,6 +498,8 @@ async function performAnalysis(address) {
         sanctionsData: sanctionsCheck
       });
       
+      console.log('[H3 Aspis] AI analysis complete');
+      
       // Apply tier gating
       const gatedResult = applyTierGating(
         aiAnalysis,
@@ -460,26 +507,52 @@ async function performAnalysis(address) {
         CONFIG.features.demoMode
       );
       
+      console.log('[H3 Aspis] Returning AI result:', gatedResult.status);
       return gatedResult;
       
     } catch (error) {
-      console.error('[H3 Aspis] AI analysis failed:', error);
+      console.warn('[H3 Aspis] AI analysis failed, using fallback:', error.message);
       // Fall through to fallback analysis
     }
+  } else {
+    console.log('[H3 Aspis] AI disabled, using fallback analysis');
   }
   
-  // Step 5: Fallback analysis (when AI unavailable)
-  // If we have GoPlus data, use it as fallback
-  if (goPlusData) {
-    console.log('[H3 Aspis] Using GoPlus data as fallback');
+  // Step 5: Fallback analysis (when AI unavailable or failed)
+  // If we have GoPlus data for a contract, use it
+  if (type === 'contract' && goPlusData) {
+    console.log('[H3 Aspis] Using GoPlus data as fallback for contract');
     return {
       ...goPlusData,
-      type,
+      type: 'contract',
       tooltip: goPlusData.summary
     };
   }
   
-  return createFallbackAnalysis(address, type, false);
+    // Final fallback: basic analysis based on type
+    console.log('[H3 Aspis] Using basic fallback analysis for', type);
+    const fallbackResult = createFallbackAnalysis(address, type, false);
+    console.log('[H3 Aspis] Fallback result:', fallbackResult.status);
+    console.log('[H3 Aspis] ========== Analysis Complete ==========');
+    return fallbackResult;
+    
+  } catch (error) {
+    // CRITICAL: Ensure we ALWAYS return something, never leave stuck
+    console.error('[H3 Aspis] ❌ CRITICAL ERROR in performAnalysis:', error);
+    console.error('[H3 Aspis] Returning emergency fallback to prevent stuck state');
+    
+    return {
+      status: 'yellow',
+      riskLevel: 'unknown',
+      summary: 'Analysis error - review manually',
+      reason: `An error occurred during analysis: ${error.message}. Please review this address manually before interacting.`,
+      flags: ['error', 'manual_review_needed'],
+      confidence: 0,
+      tooltip: 'Analysis Failed - Review Manually',
+      type: 'unknown',
+      error: error.message
+    };
+  }
 }
 
 /**
@@ -565,19 +638,63 @@ async function saveToHistory(address, result) {
 }
 
 /**
- * Get history from Firebase
+ * Get history (local storage or Firebase)
  */
-async function handleGetHistory(filters) {
-  // TODO: Implement Firebase history retrieval
-  return { success: true, history: [] };
+async function handleGetHistory(filters = {}) {
+  try {
+    // Always get local history first
+    const stored = await chrome.storage.local.get(['scanHistory']);
+    let history = stored.scanHistory || [];
+    
+    // Apply filters if provided
+    if (filters.status) {
+      history = history.filter(item => item.result.status === filters.status);
+    }
+    
+    if (filters.startDate) {
+      history = history.filter(item => item.timestamp >= filters.startDate);
+    }
+    
+    if (filters.endDate) {
+      history = history.filter(item => item.timestamp <= filters.endDate);
+    }
+    
+    // Sort by most recent first
+    history.sort((a, b) => b.timestamp - a.timestamp);
+    
+    console.log(`[H3 Aspis] Retrieved ${history.length} history items`);
+    
+    return { 
+      success: true, 
+      history: history,
+      source: 'local' 
+    };
+    
+  } catch (error) {
+    console.error('[H3 Aspis] Error getting history:', error);
+    return { success: false, error: error.message, history: [] };
+  }
 }
 
 /**
- * Setup Firebase authentication
+ * Setup Firebase authentication (optional)
  */
 async function setupFirebaseAuth() {
-  // TODO: Implement Firebase auth
-  console.log('[H3 Aspis] Firebase auth not yet implemented');
+  try {
+    console.log('[H3 Aspis] Firebase is disabled - using local storage only');
+    console.log('[H3 Aspis] To enable Firebase:');
+    console.log('[H3 Aspis]   1. Copy firebase-config.example.js to firebase-config.js');
+    console.log('[H3 Aspis]   2. Fill in your Firebase credentials');
+    console.log('[H3 Aspis]   3. Set enableFirebase: true in config.js');
+    
+    // Firebase is optional - extension works fine without it
+    return true;
+    
+  } catch (error) {
+    console.error('[H3 Aspis] Firebase setup error:', error);
+    // Don't fail if Firebase isn't configured
+    return false;
+  }
 }
 
 /**

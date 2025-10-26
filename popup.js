@@ -8,7 +8,10 @@ const state = {
   currentTab: 'scan',
   user: null,
   stats: { addressesScanned: 0, threatsDetected: 0, safeFound: 0 },
-  currentScanResult: null
+  currentScanResult: null,
+  pageFilters: new Set(), // Active status filters for Page tab
+  historyFilters: new Set(), // Active status filters for History tab
+  historyTimeFilter: 'all' // Time filter for History tab
 };
 
 /**
@@ -286,6 +289,9 @@ function setupPageTab() {
       showNotification('Failed to clear highlights', 'error');
     }
   });
+  
+  // Setup filter pills
+  setupFilterPills('page');
 }
 
 /**
@@ -294,13 +300,206 @@ function setupPageTab() {
 async function loadCurrentPageData() {
   const listEl = document.getElementById('page-addresses-list');
   
-  // For now, show empty state
-  // In production, this would fetch from background script
-  listEl.innerHTML = `
-    <div class="empty-state">
-      <span class="empty-icon">🔍</span>
-      <p>No addresses detected yet</p>
-      <p class="empty-hint">Visit a Web3 site or DApp</p>
+  try {
+    // Get current tab
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    
+    if (!tab || !tab.id) {
+      console.warn('[H3 Aspis Popup] No active tab found');
+      listEl.innerHTML = `
+        <div class="empty-state">
+          <span class="empty-icon">⚠️</span>
+          <p>No active tab</p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Get page scan data from content script
+    let response;
+    try {
+      response = await chrome.tabs.sendMessage(tab.id, {
+        type: 'GET_PAGE_DATA'
+      });
+    } catch (msgError) {
+      // Content script might not be loaded yet
+      console.warn('[H3 Aspis Popup] Could not get page data:', msgError.message);
+      listEl.innerHTML = `
+        <div class="empty-state">
+          <span class="empty-icon">🔄</span>
+          <p>Content script loading...</p>
+          <p class="empty-hint">Refresh the page if this persists</p>
+        </div>
+      `;
+      return;
+    }
+    
+    if (response && response.success && response.addresses && response.addresses.length > 0) {
+      // Apply status filters
+      let addresses = applyStatusFilters(response.addresses, state.pageFilters);
+      
+      if (addresses.length === 0) {
+        listEl.innerHTML = `
+          <div class="empty-state">
+            <span class="empty-icon">🔍</span>
+            <p>No matches found</p>
+            <p class="empty-hint">Try different filters</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Group addresses by status
+      const grouped = {
+        red: [],
+        yellow: [],
+        blue: [],
+        green: [],
+        purple: [],
+        addressbook: [],
+        analyzing: [],
+        pending: []
+      };
+      
+      addresses.forEach(item => {
+        let status = item.status || 'analyzing';
+        
+        // Map addressbook status to purple for grouping
+        if (status === 'addressbook') {
+          status = 'purple';
+        }
+        
+        if (!grouped[status]) {
+          console.warn('[H3 Aspis Popup] Unknown status:', status);
+          grouped.analyzing = grouped.analyzing || [];
+          grouped.analyzing.push(item);
+        } else {
+          grouped[status].push(item);
+        }
+      });
+      
+      let html = '';
+      
+      // Show analyzing first
+      if (grouped.analyzing.length > 0) {
+        html += `<div class="status-group analyzing-group">
+          <h3>Analyzing (${grouped.analyzing.length})</h3>
+          ${grouped.analyzing.map(item => createPageAddressHTML(item)).join('')}
+        </div>`;
+      }
+      
+      // Show threats (red)
+      if (grouped.red.length > 0) {
+        html += `<div class="status-group red-group">
+          <h3>Threats (${grouped.red.length})</h3>
+          ${grouped.red.map(item => createPageAddressHTML(item)).join('')}
+        </div>`;
+      }
+      
+      // Show warnings (yellow)
+      if (grouped.yellow.length > 0) {
+        html += `<div class="status-group yellow-group">
+          <h3>Warnings (${grouped.yellow.length})</h3>
+          ${grouped.yellow.map(item => createPageAddressHTML(item)).join('')}
+        </div>`;
+      }
+      
+      // Show safe (green)
+      if (grouped.green.length > 0) {
+        html += `<div class="status-group green-group">
+          <h3>Safe (${grouped.green.length})</h3>
+          ${grouped.green.map(item => createPageAddressHTML(item)).join('')}
+        </div>`;
+      }
+      
+      // Show info (blue)
+      if (grouped.blue.length > 0) {
+        html += `<div class="status-group blue-group">
+          <h3>Info (${grouped.blue.length})</h3>
+          ${grouped.blue.map(item => createPageAddressHTML(item)).join('')}
+        </div>`;
+      }
+      
+      // Show addressbook (purple)
+      if (grouped.purple.length > 0) {
+        html += `<div class="status-group purple-group">
+          <h3>Addressbook (${grouped.purple.length})</h3>
+          ${grouped.purple.map(item => createPageAddressHTML(item)).join('')}
+        </div>`;
+      }
+      
+      // Show pending
+      if (grouped.pending && grouped.pending.length > 0) {
+        html += `<div class="status-group pending-group">
+          <h3>Pending (${grouped.pending.length})</h3>
+          ${grouped.pending.map(item => createPageAddressHTML(item)).join('')}
+        </div>`;
+      }
+      
+      listEl.innerHTML = html;
+      
+      console.log('[H3 Aspis Popup] Displayed', response.addresses.length, 'addresses on page tab');
+    } else {
+      console.log('[H3 Aspis Popup] No addresses to display on page tab');
+      listEl.innerHTML = `
+        <div class="empty-state">
+          <span class="empty-icon">🔍</span>
+          <p>No addresses detected yet</p>
+          <p class="empty-hint">Visit a Web3 site or DApp</p>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('[H3 Aspis Popup] Page data load error:', error);
+    listEl.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-icon">📄</span>
+        <p>No addresses on this page</p>
+        <p class="empty-hint">Or content script not injected</p>
+      </div>
+    `;
+  }
+}
+
+/**
+ * Create HTML for page address item
+ * @param {Object} item
+ * @returns {string}
+ */
+function createPageAddressHTML(item) {
+  const address = item.address;
+  const status = item.status || 'analyzing';
+  const summary = item.summary || (status === 'analyzing' ? 'Analysis in progress...' : 'No summary');
+  const tag = item.tag || null; // Addressbook tag if exists
+  
+  // Determine display based on status and tag
+  let displayName = address;
+  let tagBadge = '';
+  
+  if (tag) {
+    // Show tag prominently
+    displayName = tag;
+    tagBadge = `<span class="tag-badge">📋 ${tag}</span>`;
+  } else {
+    displayName = shortenAddress(address);
+  }
+  
+  // Status badge with appropriate styling
+  const statusDisplay = status === 'addressbook' ? 'SAVED' : status.toUpperCase();
+  const statusClass = status === 'analyzing' ? 'analyzing pulse' : status;
+  
+  return `
+    <div class="address-item ${statusClass}" data-address="${address}">
+      <div class="result-header">
+        <span class="result-badge ${statusClass}">${statusDisplay}</span>
+        <span class="result-address" title="${address}">
+          ${displayName}
+        </span>
+      </div>
+      ${tag ? `<div class="tag-info">${tagBadge}</div>` : ''}
+      <p style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">
+        ${summary}
+      </p>
     </div>
   `;
 }
@@ -317,30 +516,147 @@ function setupHistoryTab() {
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       
-      // Load filtered history
+      // Store time filter and reload
       const filter = btn.dataset.filter;
-      loadHistory(filter);
+      state.historyTimeFilter = filter;
+      loadHistory();
+    });
+  });
+  
+  // Setup filter pills
+  setupFilterPills('history');
+}
+
+/**
+ * Setup filter pills for Page or History tab
+ * @param {string} tab - 'page' or 'history'
+ */
+function setupFilterPills(tab) {
+  const pillsContainer = document.getElementById(`${tab}-filter-pills`);
+  const activeFiltersContainer = document.getElementById(`${tab}-active-filters`);
+  const pills = pillsContainer.querySelectorAll('.pill-btn');
+  
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      const status = pill.dataset.status;
+      const filterSet = tab === 'page' ? state.pageFilters : state.historyFilters;
+      
+      // Toggle filter
+      if (filterSet.has(status)) {
+        filterSet.delete(status);
+        pill.classList.remove('active');
+      } else {
+        filterSet.add(status);
+        pill.classList.add('active');
+      }
+      
+      // Update active filters display
+      updateActiveFilters(tab);
+      
+      // Reload data with filters
+      if (tab === 'page') {
+        loadCurrentPageData();
+      } else {
+        loadHistory();
+      }
     });
   });
 }
 
 /**
- * Load scan history
- * @param {string} filter - Time filter (all, today, week, month)
+ * Update active filters display
+ * @param {string} tab - 'page' or 'history'
  */
-async function loadHistory(filter = 'all') {
+function updateActiveFilters(tab) {
+  const container = document.getElementById(`${tab}-active-filters`);
+  const filterSet = tab === 'page' ? state.pageFilters : state.historyFilters;
+  
+  if (filterSet.size === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  
+  const filterNames = {
+    red: 'Threats',
+    yellow: 'Warnings',
+    green: 'Safe',
+    blue: 'Info',
+    purple: 'Addressbook',
+    analyzing: 'Analyzing'
+  };
+  
+  container.innerHTML = Array.from(filterSet).map(status => `
+    <span class="active-filter-tag status-${status}" data-status="${status}">
+      ${filterNames[status]}
+      <span class="remove-filter">×</span>
+    </span>
+  `).join('');
+  
+  // Add click handlers to remove filters
+  container.querySelectorAll('.active-filter-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+      const status = tag.dataset.status;
+      filterSet.delete(status);
+      
+      // Update pill button
+      const pill = document.querySelector(`#${tab}-filter-pills .pill-btn[data-status="${status}"]`);
+      if (pill) pill.classList.remove('active');
+      
+      // Update display and reload
+      updateActiveFilters(tab);
+      if (tab === 'page') {
+        loadCurrentPageData();
+      } else {
+        loadHistory();
+      }
+    });
+  });
+}
+
+/**
+ * Filter items by status
+ * @param {Array} items - Items to filter
+ * @param {Set} filters - Active status filters
+ * @returns {Array} - Filtered items
+ */
+function applyStatusFilters(items, filters) {
+  if (filters.size === 0) return items;
+  
+  return items.filter(item => {
+    const status = item.status || item.result?.status || 'blue';
+    return filters.has(status) || (status === 'addressbook' && filters.has('purple'));
+  });
+}
+
+/**
+ * Load scan history
+ */
+async function loadHistory() {
   const listEl = document.getElementById('history-list');
   
   try {
     const response = await chrome.runtime.sendMessage({
       type: 'GET_HISTORY',
-      filters: { timeRange: filter }
+      filters: { timeRange: state.historyTimeFilter }
     });
     
     if (response.success && response.history && response.history.length > 0) {
-      listEl.innerHTML = response.history.map(item => 
-        createHistoryItemHTML(item)
-      ).join('');
+      // Apply status filters
+      let filteredHistory = applyStatusFilters(response.history, state.historyFilters);
+      
+      if (filteredHistory.length > 0) {
+        listEl.innerHTML = filteredHistory.map(item => 
+          createHistoryItemHTML(item)
+        ).join('');
+      } else {
+        listEl.innerHTML = `
+          <div class="empty-state">
+            <span class="empty-icon">🔍</span>
+            <p>No matches found</p>
+            <p class="empty-hint">Try different filters</p>
+          </div>
+        `;
+      }
     } else {
       listEl.innerHTML = `
         <div class="empty-state">
@@ -368,14 +684,22 @@ async function loadHistory(filter = 'all') {
  * @returns {string}
  */
 function createHistoryItemHTML(item) {
+    const result = item.result || item;
+  const status = result.status || 'blue';
+  const summary = result.summary || 'No summary available';
+  const timestamp = item.timestamp ? new Date(item.timestamp).toLocaleString() : 'Unknown time';
+  
   return `
-    <div class="address-item" data-address="${item.address}">
+    <div class="address-item" data-address="${item.address}" onclick="showHistoryDetails('${item.address}')">
       <div class="result-header">
-        <span class="result-badge ${item.status}">${item.status.toUpperCase()}</span>
-        <span class="result-address">${shortenAddress(item.address)}</span>
+        <span class="result-badge ${status}">${status.toUpperCase()}</span>
+        <span class="result-address" title="${item.address}">${shortenAddress(item.address)}</span>
       </div>
-      <p style="font-size: 12px; color: var(--color-text-secondary); margin-top: 8px;">
-        ${item.summary || 'No summary available'}
+      <p style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">
+        ${summary}
+      </p>
+      <p style="font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px;">
+        ${timestamp}
       </p>
     </div>
   `;
@@ -867,7 +1191,12 @@ async function loadUserInfo() {
     }
     
   } catch (error) {
-    console.error('[H3 Aspis Popup] Failed to load user info:', error);
+    // Silently handle - background script may still be initializing
+    console.warn('[H3 Aspis Popup] Could not load user info (background may still be starting)');
+    
+    // Set defaults
+    state.user = { tier: 'free', isAuthenticated: false, settings: { historyEnabled: true } };
+    state.stats = { addressesScanned: 0, threatsDetected: 0, safeFound: 0 };
   }
 }
 

@@ -123,14 +123,22 @@ async function analyzeAddressesSequentially(addresses) {
   const doSecurityCheck = settings.addressbookSecurityCheck || false;
   
   for (const address of addresses) {
+    // Safety check - skip invalid addresses
+    if (!address || typeof address !== 'string') {
+      console.warn('[H3 Aspis] ⚠️ Skipping invalid address:', address);
+      continue;
+    }
+    
     try {
       const addressLower = address.toLowerCase();
       console.log(`[H3 Aspis] 🔍 Checking address: ${addressLower}`);
       console.log(`[H3 Aspis] 📚 Current addressbook has ${state.addressbook.size} entries`);
       
       // Check if in addressbook first (BEFORE marking as pending)
+      let addressbookTag = null;
       if (state.addressbook.has(addressLower)) {
         const entry = state.addressbook.get(addressLower);
+        addressbookTag = entry.tag;
         console.log(`[H3 Aspis] ✅ FOUND in addressbook! Tag: "${entry.tag}", Security check: ${doSecurityCheck}`);
         
         if (!doSecurityCheck) {
@@ -140,31 +148,51 @@ async function analyzeAddressesSequentially(addresses) {
             isAddressbook: true,
             tag: entry.tag,
             summary: `📋 ${entry.tag}`,
-            tooltip: `Your contact: ${entry.tag}`
+            tooltip: `Your contact: ${entry.tag}`,
+            riskLevel: 'info',
+            flags: []
           };
           
           console.log(`[H3 Aspis] 💜 Showing purple tag (no security check): ${entry.tag}`);
+          
+          // Mark as scanned and store result
+          state.scannedAddresses.add(addressLower);
+          state.pendingAnalysis.set(addressLower, { 
+            result: result,
+            nodes: [],
+            id: `h3-addr-${++state.addressIdCounter}`,
+            tag: entry.tag
+          });
+          
           highlightAddress(address, result);
           continue; // Skip to next address
         } else {
           // User wants security check for addressbook entries
           console.log(`[H3 Aspis] 🔐 Address in addressbook (with security check): ${entry.tag}`);
-          // Will proceed to analysis with tag info
+          // Will proceed to analysis with tag info stored
         }
       } else {
         console.log(`[H3 Aspis] ❌ Address NOT in addressbook`);
-        console.log(`[H3 Aspis] 🔎 Looking for: ${addressLower}`);
-        console.log(`[H3 Aspis] 📋 Have: ${Array.from(state.addressbook.keys()).join(', ')}`);
       }
       
       // Mark as pending and show loading state for addresses that need analysis
-      if (!state.pendingAnalysis.has(address)) {
-        state.pendingAnalysis.set(address, { 
+      if (!state.pendingAnalysis.has(addressLower)) {
+        state.pendingAnalysis.set(addressLower, { 
           status: 'pending', 
           nodes: [],
-          id: `h3-addr-${++state.addressIdCounter}`
+          id: `h3-addr-${++state.addressIdCounter}`,
+          tag: addressbookTag // Store tag for later use
         });
+      } else {
+        // Update existing entry with tag if found
+        const existing = state.pendingAnalysis.get(addressLower);
+        if (addressbookTag) {
+          existing.tag = addressbookTag;
+        }
       }
+      
+      // Add to scanned set
+      state.scannedAddresses.add(addressLower);
       
       // Show loading state for this address
       highlightAddress(address, { status: 'loading' });
@@ -248,8 +276,11 @@ function findAddressesInDOM() {
     // Find full addresses
     const fullMatches = text.matchAll(SCAN_CONFIG.FULL_ADDRESS_REGEX);
     for (const match of fullMatches) {
-      if (addresses.size < SCAN_CONFIG.MAX_ADDRESSES) {
-        addresses.add(match[1].toLowerCase());
+      if (addresses.size < SCAN_CONFIG.MAX_ADDRESSES && match[1]) {
+        const addr = match[1].trim();
+        if (addr && addr.length === 42) {
+          addresses.add(addr.toLowerCase());
+        }
       }
     }
   }
@@ -274,8 +305,11 @@ function findAddressesInDOM() {
       if (value) {
         const matches = value.matchAll(SCAN_CONFIG.FULL_ADDRESS_REGEX);
         for (const match of matches) {
-          if (addresses.size < SCAN_CONFIG.MAX_ADDRESSES) {
-            addresses.add(match[1].toLowerCase());
+          if (addresses.size < SCAN_CONFIG.MAX_ADDRESSES && match[1]) {
+            const addr = match[1].trim();
+            if (addr && addr.length === 42) {
+              addresses.add(addr.toLowerCase());
+            }
           }
         }
       }
@@ -289,8 +323,11 @@ function findAddressesInDOM() {
         const value = element.getAttribute(attr);
         if (value && SCAN_CONFIG.FULL_ADDRESS_REGEX.test(value)) {
           const match = value.match(SCAN_CONFIG.FULL_ADDRESS_REGEX);
-          if (match && addresses.size < SCAN_CONFIG.MAX_ADDRESSES) {
-            addresses.add(match[1].toLowerCase());
+          if (match && match[1] && addresses.size < SCAN_CONFIG.MAX_ADDRESSES) {
+            const addr = match[1].trim();
+            if (addr && addr.length === 42) {
+              addresses.add(addr.toLowerCase());
+            }
           }
         }
       }
@@ -301,11 +338,49 @@ function findAddressesInDOM() {
 }
 
 /**
+ * Update existing highlight span
+ */
+function updateExistingHighlight(span, result) {
+  span.className = 'h3-aspis-highlight';
+  
+  if (result.tag) {
+    span.textContent = result.tag;
+  }
+  
+  if (result.status === 'addressbook') {
+    span.className += ' h3-aspis-addressbook';
+    span.title = result.tooltip || `Your contact: ${result.tag}`;
+  } else if (result.status === 'loading') {
+    span.className += ' h3-aspis-loading';
+    span.title = result.tag ? `📋 ${result.tag} | Analyzing...` : 'Analyzing...';
+  } else {
+    span.className += ` h3-aspis-${result.status}`;
+    span.title = result.tooltip || result.summary || result.status.toUpperCase();
+  }
+  
+  span.dataset.status = result.status || 'unknown';
+  console.log(`[H3 Aspis] ✅ Updated highlight: ${span.dataset.address} → ${result.status}`);
+}
+
+/**
  * Highlight a single address with its result
  * @param {string} address - Address to highlight
  * @param {Object} result - Analysis result
  */
 function highlightAddress(address, result) {
+  const addressLower = address.toLowerCase();
+  
+  // Try to update existing highlights first
+  const existing = document.querySelectorAll(`span.h3-aspis-highlight[data-address="${addressLower}"]`);
+  
+  if (existing.length > 0) {
+    console.log(`[H3 Aspis] Updating ${existing.length} existing highlights`);
+    existing.forEach(span => updateExistingHighlight(span, result));
+    return;
+  }
+  
+  // Create new highlights
+  console.log(`[H3 Aspis] Creating new highlights for ${address}`);
   const walker = document.createTreeWalker(
     document.body,
     NodeFilter.SHOW_TEXT,
@@ -350,8 +425,13 @@ function highlightAddresses(results) {
   
   // Highlight each address separately to avoid confusion
   Object.entries(results).forEach(([address, result]) => {
+    // Store result in pending analysis for later retrieval
+    const addressData = state.pendingAnalysis.get(address) || { nodes: [] };
+    addressData.result = result;
+    state.pendingAnalysis.set(address, addressData);
+    
+    // Highlight the address
     highlightAddress(address, result);
-    state.pendingAnalysis.delete(address);
   });
   
   // Show notification badge
@@ -403,17 +483,24 @@ function highlightNodeWithResult(node, targetAddress, result, addressId) {
     let className = `h3-aspis-highlight`;
     let tooltip = '';
     
-    // Check if this is an addressbook entry
-    if (result.isAddressbook) {
+    // Always show tag if it exists (whether addressbook-only or with security analysis)
+    if (result.tag) {
       displayText = result.tag;
+    }
+    
+    // Set styling based on status
+    if (result.status === 'addressbook') {
+      // Addressbook without analysis - purple
       className += ' h3-aspis-addressbook';
       tooltip = result.tooltip || `Your contact: ${result.tag}`;
     } else if (result.status === 'loading') {
+      // Currently analyzing - grey pulse
       className += ' h3-aspis-loading';
-      tooltip = 'Analyzing...';
+      tooltip = result.tag ? `📋 ${result.tag} | Analyzing...` : 'Analyzing...';
     } else {
+      // Has analysis result - use status color
       className += ` h3-aspis-${result.status}`;
-      tooltip = result.tooltip || `${result.status.toUpperCase()}: Click H3 Aspis icon for details`;
+      tooltip = result.tooltip || result.summary || `${result.status.toUpperCase()}: Click H3 Aspis icon for details`;
     }
     
     // Create highlighted span
@@ -537,6 +624,64 @@ function observeDOMChanges() {
 }
 
 /**
+ * Get current page data for popup display
+ * @returns {Array} Array of address data objects
+ */
+function getPageData() {
+  const addresses = [];
+  
+  // Get all scanned addresses with results
+  state.scannedAddresses.forEach(address => {
+    // Safety check - address must exist and be a string
+    if (!address || typeof address !== 'string') {
+      console.warn('[H3 Aspis] Invalid address in scannedAddresses:', address);
+      return;
+    }
+    
+    const addressData = state.pendingAnalysis.get(address);
+    const addressLower = address.toLowerCase();
+    
+    if (addressData && addressData.result) {
+      // Has result
+      addresses.push({
+        address: address,
+        status: addressData.result.status,
+        summary: addressData.result.summary,
+        riskLevel: addressData.result.riskLevel,
+        flags: addressData.result.flags || [],
+        tag: addressData.tag || (state.addressbook.has(addressLower) ? state.addressbook.get(addressLower).tag : null),
+        isAddressbook: addressData.result.isAddressbook || false
+      });
+    } else if (addressData) {
+      // Still analyzing
+      addresses.push({
+        address: address,
+        status: 'analyzing',
+        summary: addressData.tag ? `📋 ${addressData.tag} | Analyzing...` : 'Analysis in progress...',
+        riskLevel: 'unknown',
+        flags: [],
+        tag: addressData.tag || null,
+        isAddressbook: !!addressData.tag
+      });
+    } else {
+      // No data yet (shouldn't happen, but handle it)
+      addresses.push({
+        address: address,
+        status: 'pending',
+        summary: 'Pending analysis...',
+        riskLevel: 'unknown',
+        flags: [],
+        tag: state.addressbook.has(addressLower) ? state.addressbook.get(addressLower).tag : null
+      });
+    }
+  });
+  
+  console.log('[H3 Aspis] Returning page data:', addresses.length, 'addresses');
+  console.log('[H3 Aspis] Sample:', addresses.slice(0, 3));
+  return addresses;
+}
+
+/**
  * Handle messages from background script
  * @param {Object} message - Message object
  * @param {Object} sender - Sender information
@@ -554,10 +699,37 @@ function handleMessage(message, sender, sendResponse) {
     case 'SINGLE_RESULT':
       // Handle result for a single address
       if (message.address && message.result) {
-        highlightAddress(message.address, message.result);
-        state.pendingAnalysis.delete(message.address);
+        const addressLower = message.address.toLowerCase();
+        
+        // Get existing data (which may have tag info)
+        const addressData = state.pendingAnalysis.get(addressLower) || { nodes: [] };
+        
+        // Merge result with tag if exists
+        const finalResult = { ...message.result };
+        if (addressData.tag) {
+          finalResult.tag = addressData.tag;
+          finalResult.isAddressbook = true;
+          // Prepend tag to summary
+          finalResult.summary = `📋 ${addressData.tag} | ${message.result.summary}`;
+        }
+        
+        // Store complete result
+        addressData.result = finalResult;
+        state.pendingAnalysis.set(addressLower, addressData);
+        
+        // Mark as scanned (in case it wasn't already)
+        state.scannedAddresses.add(addressLower);
+        
+        // Highlight the address with final result
+        highlightAddress(message.address, finalResult);
       }
       sendResponse({ success: true });
+      break;
+      
+    case 'GET_PAGE_DATA':
+      // Return current page data for popup
+      const pageData = getPageData();
+      sendResponse({ success: true, addresses: pageData });
       break;
       
     case 'RESCAN_PAGE':
