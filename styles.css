@@ -1,0 +1,222 @@
+/* H3 Aspis - Content Script Styles */
+/* Light pastel pink theme (#FF87A9) with minimal, transparent design */
+
+/* Address Highlight Classes */
+.h3-aspis-highlight {
+  display: inline;
+  padding: 2px 4px;
+  border-radius: 4px;
+  cursor: help;
+  transition: all 0.2s ease;
+  position: relative;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.h3-aspis-highlight:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Green - Safe/Verified */
+.h3-aspis-green {
+  background-color: rgba(144, 238, 144, 0.15);
+  border-bottom: 2px solid rgba(144, 238, 144, 0.6);
+  color: #2d5016;
+}
+
+.h3-aspis-green:hover {
+  background-color: rgba(144, 238, 144, 0.25);
+}
+
+/* Yellow - Suspicious/Warning */
+.h3-aspis-yellow {
+  background-color: rgba(255, 223, 186, 0.15);
+  border-bottom: 2px solid rgba(255, 193, 7, 0.6);
+  color: #664d03;
+}
+
+.h3-aspis-yellow:hover {
+  background-color: rgba(255, 223, 186, 0.25);
+}
+
+/* Red - Dangerous/Malicious */
+.h3-aspis-red {
+  background-color: rgba(255, 182, 193, 0.15);
+  border-bottom: 2px solid rgba(220, 53, 69, 0.6);
+  color: #721c24;
+}
+
+.h3-aspis-red:hover {
+  background-color: rgba(255, 182, 193, 0.25);
+}
+
+/* Blue - Informational/Contract */
+.h3-aspis-blue {
+  background-color: rgba(216, 191, 216, 0.15);
+  border-bottom: 2px solid rgba(168, 141, 255, 0.6);
+  color: #4a3a7a;
+}
+
+.h3-aspis-blue:hover {
+  background-color: rgba(216, 191, 216, 0.25);
+}
+
+/* Loading State - Light grey with pulsating animation */
+.h3-aspis-loading {
+  background-color: rgba(200, 200, 200, 0.15);
+  border-bottom: 2px dashed rgba(150, 150, 150, 0.4);
+  animation: h3-pulse 2s ease-in-out infinite;
+}
+
+@keyframes h3-pulse {
+  0%, 100% {
+    opacity: 0.5;
+    background-color: rgba(200, 200, 200, 0.1);
+  }
+  50% {
+    opacity: 0.8;
+    background-color: rgba(200, 200, 200, 0.25);
+  }
+}
+
+/* Addressbook Entry - Purple highlight */
+.h3-aspis-addressbook {
+  background-color: rgba(216, 191, 216, 0.2);
+  border-bottom: 2px solid rgba(186, 85, 211, 0.6);
+  color: #8b7ba8;
+  font-weight: 600;
+}
+
+.h3-aspis-addressbook:hover {
+  background-color: rgba(216, 191, 216, 0.3);
+}
+
+/* Tooltip Enhancement (optional overlay) */
+.h3-aspis-tooltip {
+  position: absolute;
+  z-index: 10000;
+  background: linear-gradient(135deg, rgba(230, 230, 250, 0.98), rgba(255, 255, 255, 0.98));
+  border: 1px solid rgba(168, 141, 255, 0.3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  font-size: 13px;
+  max-width: 300px;
+  backdrop-filter: blur(10px);
+  animation: tooltipFadeIn 0.2s ease;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.h3-aspis-tooltip-title {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #4a3a7a;
+  font-size: 14px;
+}
+
+.h3-aspis-tooltip-content {
+  color: #666;
+  line-height: 1.4;
+}
+
+.h3-aspis-tooltip-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.h3-aspis-tooltip-badge.safe {
+  background: rgba(144, 238, 144, 0.2);
+  color: #2d5016;
+}
+
+.h3-aspis-tooltip-badge.warning {
+  background: rgba(255, 193, 7, 0.2);
+  color: #664d03;
+}
+
+.h3-aspis-tooltip-badge.danger {
+  background: rgba(220, 53, 69, 0.2);
+  color: #721c24;
+}
+
+.h3-aspis-tooltip-badge.info {
+  background: rgba(168, 141, 255, 0.2);
+  color: #4a3a7a;
+}
+
+/* Notification Badge (for page scan complete) */
+.h3-aspis-scan-badge {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  background: linear-gradient(135deg, rgba(230, 230, 250, 0.95), rgba(255, 255, 255, 0.95));
+  border: 1px solid rgba(168, 141, 255, 0.4);
+  border-radius: 24px;
+  padding: 12px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  backdrop-filter: blur(10px);
+  animation: slideInUp 0.3s ease;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.h3-aspis-scan-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.h3-aspis-scan-badge-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.h3-aspis-scan-badge-text {
+  color: #4a3a7a;
+  font-weight: 500;
+}
+
+.h3-aspis-scan-badge-close {
+  margin-left: 8px;
+  cursor: pointer;
+  opacity: 0.6;
+  font-weight: bold;
+}
+
+.h3-aspis-scan-badge-close:hover {
+  opacity: 1;
+}
+

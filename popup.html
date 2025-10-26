@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>H3 Aspis - Web3 Security Companion</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Sticky Header Section -->
+    <div class="sticky-header">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-logo">
+          <img src="icons/logo300x100.png" alt="H3 Aspis" class="logo-image" />
+        </div>
+        <div class="header-status" id="status-badge">
+          <span class="status-dot"></span>
+          <span class="status-text">Ready</span>
+        </div>
+      </header>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar" id="stats-bar">
+        <div class="stat-item">
+          <span class="stat-value" id="stat-scanned">0</span>
+          <span class="stat-label">Scanned</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="stat-threats">0</span>
+          <span class="stat-label">Threats</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="stat-safe">0</span>
+          <span class="stat-label">Safe</span>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <nav class="tabs" role="tablist">
+        <button class="tab-btn active" data-tab="scan" role="tab" aria-selected="true">
+          <span class="tab-icon">🔍</span>
+          <span class="tab-label">Scan</span>
+        </button>
+        <button class="tab-btn" data-tab="page" role="tab" aria-selected="false">
+          <span class="tab-icon">📄</span>
+          <span class="tab-label">Page</span>
+        </button>
+        <button class="tab-btn" data-tab="history" role="tab" aria-selected="false">
+          <span class="tab-icon">📜</span>
+          <span class="tab-label">History</span>
+        </button>
+        <button class="tab-btn" data-tab="settings" role="tab" aria-selected="false">
+          <span class="tab-icon">⚙️</span>
+          <span class="tab-label">Settings</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Scrollable Tab Content -->
+    <main class="tab-content">
+      <!-- Scan Tab -->
+      <div class="tab-panel active" id="tab-scan" role="tabpanel">
+        <div class="panel-header">
+          <h2>Manual Address Scan</h2>
+          <p class="panel-description">Enter any Web3 address to analyze</p>
+        </div>
+
+        <div class="scan-input-group">
+          <input 
+            type="text" 
+            id="manual-address-input" 
+            class="input-field"
+            placeholder="0x... (Ethereum, Base, Polygon)"
+            spellcheck="false"
+          />
+          <button id="manual-scan-btn" class="btn btn-primary">
+            <span class="btn-icon">🔍</span>
+            <span class="btn-text">Analyze</span>
+          </button>
+        </div>
+
+        <!-- Scan Result -->
+        <div id="scan-result" class="result-card hidden">
+          <div class="result-header">
+            <span class="result-badge" id="result-badge"></span>
+            <span class="result-address" id="result-address"></span>
+          </div>
+          <div class="result-body">
+            <h3 class="result-title" id="result-title"></h3>
+            <p class="result-description" id="result-description"></p>
+            <div class="result-meta">
+              <div class="meta-item">
+                <span class="meta-label">Type:</span>
+                <span class="meta-value" id="result-type"></span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Risk:</span>
+                <span class="meta-value" id="result-risk"></span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Confidence:</span>
+                <span class="meta-value" id="result-confidence"></span>
+              </div>
+            </div>
+            <details class="result-details">
+              <summary class="details-toggle">View Full Analysis</summary>
+              <div class="details-content" id="result-full-analysis"></div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="scan-loading" class="loading-state hidden">
+          <div class="loading-spinner"></div>
+          <p>Analyzing address...</p>
+        </div>
+      </div>
+
+      <!-- Current Page Tab -->
+      <div class="tab-panel" id="tab-page" role="tabpanel">
+        <div class="panel-header">
+          <h2>Current Page Analysis</h2>
+          <p class="panel-description">Addresses detected on this page</p>
+        </div>
+
+        <div class="page-controls">
+          <button id="rescan-page-btn" class="btn btn-secondary">
+            <span class="btn-icon">🔄</span>
+            <span class="btn-text">Rescan Page</span>
+          </button>
+          <button id="clear-highlights-btn" class="btn btn-ghost">
+            <span class="btn-icon">✕</span>
+            <span class="btn-text">Clear Highlights</span>
+          </button>
+        </div>
+
+        <div id="page-addresses-list" class="addresses-list">
+          <div class="empty-state">
+            <span class="empty-icon">🔍</span>
+            <p>No addresses detected yet</p>
+            <p class="empty-hint">Visit a Web3 site or DApp</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- History Tab -->
+      <div class="tab-panel" id="tab-history" role="tabpanel">
+        <div class="panel-header">
+          <h2>Scan History</h2>
+          <p class="panel-description">Your recent address analyses</p>
+        </div>
+
+        <div class="history-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="today">Today</button>
+          <button class="filter-btn" data-filter="week">Week</button>
+          <button class="filter-btn" data-filter="month">Month</button>
+        </div>
+
+        <div id="history-list" class="addresses-list">
+          <div class="empty-state">
+            <span class="empty-icon">📜</span>
+            <p>No history yet</p>
+            <p class="empty-hint">Scan some addresses to get started</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div class="tab-panel" id="tab-settings" role="tabpanel">
+        <div class="panel-header">
+          <h2>Settings</h2>
+          <p class="panel-description">Manage your preferences</p>
+        </div>
+
+        <div class="settings-section">
+          <h3 class="section-title">Account</h3>
+          <div class="settings-card" id="auth-section">
+            <div class="auth-info hidden" id="user-info">
+              <div class="user-avatar">👤</div>
+              <div class="user-details">
+                <p class="user-email" id="user-email">Not logged in</p>
+                <span class="user-tier-badge" id="user-tier">Free</span>
+              </div>
+            </div>
+            <button id="auth-btn" class="btn btn-primary">
+              <span class="btn-icon">🔐</span>
+              <span class="btn-text">Sign in with Google</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3 class="section-title">Privacy</h3>
+          <div class="settings-item">
+            <div class="setting-info">
+              <p class="setting-label">History Logging</p>
+              <p class="setting-description">Save scan results to your account</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="history-toggle">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="settings-item">
+            <div class="setting-info">
+              <p class="setting-label">Auto-Scan Pages</p>
+              <p class="setting-description">Automatically scan addresses on page load</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="auto-scan-toggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3 class="section-title">My Addressbook</h3>
+          
+          <!-- Add New Contact Form -->
+          <div class="settings-card">
+            <p class="setting-label">Add Contact</p>
+            <div class="addressbook-add-form">
+              <input 
+                type="text" 
+                id="addressbook-address-input" 
+                class="input-field"
+                placeholder="0x... address"
+                style="margin-bottom: 8px;"
+              />
+              <input 
+                type="text" 
+                id="addressbook-tag-input" 
+                class="input-field"
+                placeholder="Tag (e.g., 'John', 'Uniswap Router')"
+                style="margin-bottom: 8px;"
+              />
+              <button id="addressbook-add-btn" class="btn btn-primary btn-full">
+                <span class="btn-icon">➕</span>
+                <span class="btn-text">Add to Addressbook</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Addressbook List -->
+          <div class="settings-card" style="margin-top: 12px;">
+            <p class="setting-label">Saved Contacts (<span id="addressbook-count">0</span>)</p>
+            <div id="addressbook-list" class="addressbook-list">
+              <p style="text-align: center; color: var(--color-text-light); padding: 20px;">No contacts yet</p>
+            </div>
+          </div>
+
+          <!-- Security Check Toggle -->
+          <div class="settings-item" style="margin-top: 12px;">
+            <div class="setting-info">
+              <p class="setting-label">Security Check for Contacts</p>
+              <p class="setting-description">Also analyze security for saved addresses</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="addressbook-security-toggle">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <!-- Sync Options -->
+          <div class="settings-item">
+            <div class="setting-info">
+              <p class="setting-label">Addressbook Sync</p>
+              <p class="setting-description">Sync contacts to cloud or keep local</p>
+            </div>
+            <select id="addressbook-sync-select" class="select-field">
+              <option value="local">Local Only</option>
+              <option value="cloud">Cloud Sync (Coming Soon)</option>
+            </select>
+          </div>
+
+          <!-- Export/Import -->
+          <div style="display: flex; gap: 8px; margin-top: 12px;">
+            <button id="addressbook-export-btn" class="btn btn-secondary" style="flex: 1;">
+              <span class="btn-icon">📥</span>
+              <span class="btn-text">Export</span>
+            </button>
+            <button id="addressbook-import-btn" class="btn btn-secondary" style="flex: 1;">
+              <span class="btn-icon">📤</span>
+              <span class="btn-text">Import</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3 class="section-title">Audit Trail</h3>
+          
+          <!-- Storage Option -->
+          <div class="settings-item">
+            <div class="setting-info">
+              <p class="setting-label">History Storage</p>
+              <p class="setting-description">Where to save your scan history</p>
+            </div>
+            <select id="audit-trail-storage-select" class="select-field">
+              <option value="none">Don't Save</option>
+              <option value="local">Local Only</option>
+              <option value="cloud">Cloud Sync (Coming Soon)</option>
+            </select>
+          </div>
+
+          <!-- Retention Period -->
+          <div class="settings-item">
+            <div class="setting-info">
+              <p class="setting-label">Auto-Delete After</p>
+              <p class="setting-description">Automatically remove old history</p>
+            </div>
+            <select id="retention-period-select" class="select-field">
+              <option value="never">Never (Keep Forever)</option>
+              <option value="1week">1 Week</option>
+              <option value="1month">1 Month</option>
+              <option value="3months">3 Months</option>
+              <option value="1year">1 Year</option>
+            </select>
+          </div>
+
+          <!-- Clear History -->
+          <button id="clear-history-btn" class="btn btn-secondary btn-full" style="margin-top: 12px;">
+            <span class="btn-icon">🗑️</span>
+            <span class="btn-text">Clear All History</span>
+          </button>
+        </div>
+
+        <div class="settings-section">
+          <h3 class="section-title">Data</h3>
+          <button id="clear-cache-btn" class="btn btn-secondary btn-full">
+            <span class="btn-icon">🗑️</span>
+            <span class="btn-text">Clear Analysis Cache</span>
+          </button>
+        </div>
+
+        <div class="settings-section">
+          <h3 class="section-title">About</h3>
+          <div class="about-card">
+            <p class="about-version">Version 0.1.0</p>
+            <p class="about-description">
+              H3 Aspis uses on-device AI (Gemini Nano) for privacy-first Web3 security analysis.
+            </p>
+            <div class="about-links">
+              <a href="#" class="link">Documentation</a>
+              <a href="#" class="link">Support</a>
+              <a href="#" class="link">GitHub</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
+

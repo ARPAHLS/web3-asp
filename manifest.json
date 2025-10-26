@@ -1,0 +1,65 @@
+{
+  "manifest_version": 3,
+  "name": "H3 Aspis: Web3 Security Companion",
+  "version": "0.3.8",
+  "description": "Privacy-first Web3 security analysis. Real-time smart contract and wallet screening powered by on-device AI.",
+  
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "identity"
+  ],
+  
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/logo16x16.png",
+      "32": "icons/logo32x32.png",
+      "48": "icons/logo48x48.png",
+      "128": "icons/logo128x128.png"
+    }
+  },
+  
+  "icons": {
+    "16": "icons/logo16x16.png",
+    "32": "icons/logo32x32.png",
+    "48": "icons/logo48x48.png",
+    "128": "icons/logo128x128.png"
+  },
+  
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com https://api.etherscan.io https://api.basescan.org https://api.polygonscan.com https://eth-mainnet.g.alchemy.com https://base-mainnet.g.alchemy.com https://polygon-mainnet.g.alchemy.com https://cloudflare-eth.com https://rpc.ankr.com https://api.gopluslabs.io;"
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*", "images/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  
+  "externally_connectable": {
+    "matches": ["https://*.firebaseapp.com/*", "https://*.web.app/*"]
+  }
+}
+
