@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "H3 Aspis: Web3 Security Companion",
+  "name": "Web3 ASP: Agentic Security Protocol",
   "version": "0.3.8",
   "description": "Privacy-first Web3 security analysis. Real-time smart contract and wallet screening powered by on-device AI.",
   
@@ -62,4 +62,5 @@
     "matches": ["https://*.firebaseapp.com/*", "https://*.web.app/*"]
   }
 }
+
 
