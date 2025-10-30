@@ -215,7 +215,6 @@ rpc: {
 ### Learn More
 
 - Read **README.md** for full documentation
-- Check **HACKATHON_STORY.md** for our journey and vision
 - See **ENV_TEMPLATE.md** for configuration reference
 - Visit **[github.com/arpahls/web3-asp](https://github.com/arpahls/web3-asp)** for latest updates
 
@@ -259,5 +258,6 @@ rpc: {
 ---
 
 **Ready to go? Load the extension and start scanning!** 🛡️
+
 
 Questions? Check the main **[README.md](README.md)** or open an issue at **[github.com/arpahls/web3-asp/issues](https://github.com/arpahls/web3-asp/issues)**.
