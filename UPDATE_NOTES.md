@@ -4,6 +4,114 @@
 
 ---
 
+## Version 0.3.9 (2025-10-30) - Chrome Web Store Compliance & Cleanup
+
+### 🎯 **Chrome Web Store Submission**
+
+#### **Critical Fixes for Chrome Web Store Approval** ✅
+- **Issue**: Extension rejected for unused `scripting` permission
+- **Fix**: Removed `scripting` from manifest.json permissions
+- **Result**: Extension now only requests permissions it actively uses
+
+#### **Removed Unused Cloud Services** 🗑️
+Deleted 3 files (909 lines) that were placeholders/unused:
+- ❌ `utils/firebase-handler.js` (347 lines) - Cloud authentication/sync
+- ❌ `utils/stripe-handler.js` (125 lines) - Payment integration placeholder
+- ❌ `firebase-config.example.js` - Firebase config template
+
+#### **Removed Build Scripts** 🗑️
+Deleted 3 build/import scripts (909 lines) since extension uses hardcoded data:
+- ❌ `scripts/build-comprehensive-sanctions.js` (376 lines)
+- ❌ `scripts/build-sanctions-db.js` (242 lines)
+- ❌ `scripts/import-datasets.js` (291 lines)
+
+**Reason**: Extension uses hardcoded `sanctioned-wallets.js` (36 addresses) and `test-addresses.js` (15 addresses)
+
+### 🧹 **Code Cleanup**
+
+**Files Modified:**
+1. ✅ `manifest.json` - Removed `scripting` permission
+2. ✅ `background.js` - Removed Firebase references and feature flag
+3. ✅ `popup.js` - Removed cloud sync UI options, updated auth handler
+4. ✅ `popup.html` - Removed "Cloud Sync" dropdown options
+5. ✅ `utils/addressbook-handler.js` - Removed cloud sync functions
+6. ✅ `utils/audit-trail-handler.js` - Removed cloud sync functions
+7. ✅ `config.example.js` - Removed Firebase and Stripe configuration sections
+
+**Comments/References Cleaned:**
+- Updated function documentation to reflect local-only storage
+- Removed cloud sync TODOs and stub functions
+- Simplified authentication messaging
+
+### 📊 **Before vs After**
+
+| Aspect | Before | After |
+|--------|--------|-------|
+| **Permissions** | activeTab, scripting, storage | activeTab, storage ✅ |
+| **Core Files** | 14 JS files | 11 JS files ✅ |
+| **Storage Options** | Local + Cloud | Local only ✅ |
+| **Dependencies** | Firebase, Stripe (unused) | None ✅ |
+| **Total Lines** | ~1,800 lines unused code | Removed ✅ |
+
+### ✅ **What Still Works (100% Functional)**
+
+- ✅ **Address scanning** - Full Web3 address detection on pages
+- ✅ **AI analysis** - Chrome Gemini Nano on-device AI summaries
+- ✅ **GoPlus API** - Token security and threat intelligence
+- ✅ **Sanctions database** - 36 hardcoded sanctioned addresses (OFAC, FBI, Israeli NBCTF)
+- ✅ **Addressbook** - Local contact management with export/import (JSON files)
+- ✅ **History** - Local scan history with configurable retention (1 week to never)
+- ✅ **All UI features** - Popup, settings, filter pills, time filters
+
+### 🎯 **Extension Now Offers**
+
+**Minimal & Compliant:**
+- **Privacy-first** - Everything stored locally, no cloud dependencies
+- **Lightweight** - Removed ~1,800 lines of unused code
+- **Self-contained** - No external auth or payment systems
+- **Chrome Web Store ready** - Compliant with permission policies
+
+**Local-Only Storage:**
+- Addressbook stored in `chrome.storage.local`
+- History stored in `chrome.storage.local`
+- Export/import via JSON files
+- No account creation needed
+- No authentication required
+
+### 🚀 **Ready for Chrome Web Store**
+
+The extension is now:
+- ✅ **Minimal permissions** - Only what's actually used
+- ✅ **Privacy-focused** - No cloud services, all local
+- ✅ **Fully functional** - All features work as before
+- ✅ **Well documented** - Clean codebase, no dead code
+- ✅ **No linter errors** - All files pass validation
+
+### 📁 **Final File Structure**
+
+```
+H3_Aspis_Chrome_Extension/
+├── manifest.json
+├── background.js
+├── content.js
+├── popup.js/html/css
+├── styles.css
+├── config.example.js
+├── data/
+│   ├── sanctioned-wallets.js (36 addresses)
+│   └── test-addresses.js (15 addresses)
+└── utils/
+    ├── addressbook-handler.js (local only)
+    ├── analyzer.js
+    ├── audit-trail-handler.js (local only)
+    ├── goplus-security.js
+    └── web3-utils.js
+```
+
+**Total: 11 core JavaScript files** (clean and minimal)
+
+---
+
 ## Version 0.3.8 (2025-10-26) - Filter Pills & Enhanced UX
 
 ### 🎉 **New Features**

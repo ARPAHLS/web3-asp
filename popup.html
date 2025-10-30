@@ -292,12 +292,11 @@
           <!-- Sync Options -->
           <div class="settings-item">
             <div class="setting-info">
-              <p class="setting-label">Addressbook Sync</p>
-              <p class="setting-description">Sync contacts to cloud or keep local</p>
+              <p class="setting-label">Addressbook Storage</p>
+              <p class="setting-description">Contacts stored locally in your browser</p>
             </div>
-            <select id="addressbook-sync-select" class="select-field">
-              <option value="local">Local Only</option>
-              <option value="cloud">Cloud Sync (Coming Soon)</option>
+            <select id="addressbook-sync-select" class="select-field" disabled style="opacity: 0.6;">
+              <option value="local">Local Storage</option>
             </select>
           </div>
 
@@ -324,9 +323,8 @@
               <p class="setting-description">Where to save your scan history</p>
             </div>
             <select id="audit-trail-storage-select" class="select-field">
+              <option value="local">Local Storage</option>
               <option value="none">Don't Save</option>
-              <option value="local">Local Only</option>
-              <option value="cloud">Cloud Sync (Coming Soon)</option>
             </select>
           </div>
 

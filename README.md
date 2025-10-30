@@ -2,9 +2,9 @@
 
 > Privacy-first Web3 security analysis powered by on-device AI and real-time threat intelligence
 
-**Version**: 0.3.8 | **Status**: ✅ Production Ready | **Last Updated**: October 26, 2025
+**Version**: 0.3.9 | **Status**: ✅ Production Ready | **Last Updated**: October 30, 2025
 
-Web3 ASP (H3 Aspis) is a Chrome extension that provides real-time security analysis of smart contracts and wallet addresses as you browse the Web3. Using GoPlus Security API for threat detection and Google Chrome's built-in Gemini Nano AI for intelligent summaries, Web3 ASP protects your privacy while keeping you safe.
+Web3 ASP (H3 Aspis) is a Chrome extension that provides real-time security analysis of smart contracts and wallet addresses as you browse the Web3. Using GoPlus Security API for threat detection and Google Chrome's built-in Gemini Nano AI for intelligent summaries, Web3 ASP is completely local-first with no cloud dependencies - protecting your privacy while keeping you safe.
 
 <p align="center">
   <img src="icons/logo300x100.png" alt="H3 Aspis Logo" width="300" height="100">
@@ -30,8 +30,9 @@ Web3 ASP (H3 Aspis) is a Chrome extension that provides real-time security analy
 - ✅ AI summaries run **entirely on your device** (Gemini Nano)
 - ✅ Sanctions database is 100% local (no external calls)
 - ✅ Only address sent to GoPlus API for threat intelligence
-- ✅ Addressbook and history saved locally (optional cloud sync)
-- ✅ You control retention policies (delete after 1 week to 1 year)
+- ✅ Addressbook and history saved **locally only** (no cloud, no accounts)
+- ✅ Export/import via JSON files for backup
+- ✅ You control retention policies (delete after 1 week to 1 year, or never)
 
 ### Security Architecture
 - **Tier 1**: Local sanctions database - 36 verified addresses on Ethereum Mainnet (instant)
@@ -39,10 +40,10 @@ Web3 ASP (H3 Aspis) is a Chrome extension that provides real-time security analy
 - **Tier 3**: Gemini Nano AI - Explains findings in plain English (< 2 seconds)
 - **Total**: < 3 seconds for complete analysis ⚡
 
-### Demo Mode
-- ✅ All features are **free and publicly available** for testing
-- ✅ No tier gating or paywalls
-- 🚧 Stripe integration (placeholder for future Pro tier)
+### Free & Open
+- ✅ All features are **free and publicly available**
+- ✅ No accounts, no logins, no cloud services
+- ✅ No tier gating or paywalls - everything works out of the box
 
 ---
 
@@ -51,7 +52,7 @@ Web3 ASP (H3 Aspis) is a Chrome extension that provides real-time security analy
 ### Prerequisites
 - Chrome browser (version 127+, Canary/Dev channel recommended for AI)
 - **No API keys required!** Works out of the box with free public RPCs
-- Node.js (optional, for dataset import)
+- **No account needed!** Everything runs locally
 
 ### ⚡ Quick Start (Zero Config!)
 
@@ -59,10 +60,9 @@ Web3 ASP (H3 Aspis) is a Chrome extension that provides real-time security analy
 
 1. **Clone or Download** this repository
 
-2. **Copy config files**
+2. **Copy config file**
    ```bash
    cp config.example.js config.js
-   cp firebase-config.example.js firebase-config.js
    ```
    **That's it!** The extension works with all defaults.
 
@@ -83,9 +83,9 @@ Web3 ASP (H3 Aspis) is a Chrome extension that provides real-time security analy
 **You're done!** The extension now works with:
 - ✅ Free public RPCs (no keys needed)
 - ✅ GoPlus Security API (free, no key needed)
-- ✅ Local sanctions database (36+ addresses)
+- ✅ Local sanctions database (36 addresses on Ethereum Mainnet)
 - ✅ Chrome Gemini Nano AI (on-device)
-- ✅ Local storage (no Firebase needed)
+- ✅ Local-only storage (no cloud, no accounts)
 
 📖 **For detailed setup**: See [QUICK_SETUP.md](QUICK_SETUP.md)  
 🔧 **For configuration options**: See [ENV_TEMPLATE.md](ENV_TEMPLATE.md)
@@ -103,12 +103,6 @@ Want more features? Add API keys for better performance:
 - Use [Alchemy](https://www.alchemy.com/), [Infura](https://infura.io/), or [QuickNode](https://www.quicknode.com/)
 - Update `config.js` under `rpc`
 - Benefits: Better reliability, no throttling
-
-**Option 3: Firebase Cloud Sync**
-- Create project at [Firebase Console](https://console.firebase.google.com/)
-- Configure `firebase-config.js`
-- Set `enableFirebase: true` in `config.js`
-- Benefits: Cross-device sync, cloud history
 
 ---
 
@@ -171,7 +165,7 @@ features: {
   enableSanctionsCheck: true,   // ✅ Local database
   enableGoPlus: true,            // ✅ Free API, no key needed
   enableOnDeviceAI: true,        // ✅ Chrome Gemini Nano
-  enableFirebase: false,         // ❌ Optional, disabled by default
+  enableHistory: true,           // ✅ Local history storage
   demoMode: true                 // ✅ All features unlocked
 }
 ```
@@ -216,36 +210,6 @@ Get free API keys:
 
 **Benefits**: Contract source code access, higher rate limits
 
-### ☁️ Firebase (Optional - Cloud Sync)
-
-For cross-device history and settings sync:
-
-1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com/)
-2. Enable Authentication (Google provider)
-3. Enable Firestore Database
-4. Copy your config to `firebase-config.js`:
-
-```javascript
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef"
-};
-```
-
-5. In `config.js`, set:
-```javascript
-features: {
-  enableFirebase: true  // Enable cloud features
-}
-```
-
-**Benefits**: Cloud history sync, cross-device settings, user authentication  
-**Note**: Extension works 100% offline without Firebase!
-
 ### 🔒 GoPlus Security API
 
 **No configuration needed!** GoPlus is free and requires no API key.
@@ -285,11 +249,12 @@ Web3-ASP/
 ├── utils/
 │   ├── web3-utils.js          # Blockchain helpers
 │   ├── analyzer.js            # AI prompt engineering
-│   └── firebase-handler.js    # Cloud sync (optional)
-├── data/
-│   └── sanctions-dataset.js   # Offline malicious address DB
-└── scripts/
-    └── import-datasets.js     # Dataset converter
+│   ├── addressbook-handler.js # Local contact management
+│   ├── audit-trail-handler.js # Local history management
+│   └── goplus-security.js     # Token security API
+└── data/
+    ├── sanctioned-wallets.js  # 36 sanctioned addresses (hardcoded)
+    └── test-addresses.js      # 15 test addresses (hardcoded)
 ```
 
 ### Data Flow
@@ -327,10 +292,8 @@ Content Script Highlights Address
 ├── styles.css                 # Content script styles
 ├── manifest.json              # Extension manifest
 ├── config.example.js          # Configuration template
-├── firebase-config.example.js # Firebase template
 ├── utils/                     # Utility modules
-├── data/                      # Datasets
-├── scripts/                   # Build/import scripts
+├── data/                      # Hardcoded datasets
 └── icons/                     # Extension icons
 ```
 
@@ -383,29 +346,26 @@ Content Script Highlights Address
 - Ensure filenames match manifest.json
 - Reload extension
 
-### Firebase errors
-- Verify firebase-config.js exists and is valid
-- Check Firebase console for authentication/Firestore setup
-- Ensure `enableFirebase: true` in config.js
-
 ---
 
 ## 🔒 Security & Privacy
 
 ### What Web3 ASP Does:
 - ✅ Analyzes addresses **on your device**
-- ✅ Stores sanctions lists **locally**
-- ✅ Only sends data to Firebase if you sign in and enable history
+- ✅ Stores all data **locally only**
+- ✅ Only sends addresses to GoPlus API for threat intelligence
 
-### What H3 Aspis Does NOT Do:
+### What Web3 ASP Does NOT Do:
 - ❌ Track your browsing
-- ❌ Send addresses to external servers (except Firebase, if enabled)
+- ❌ Require accounts or logins
+- ❌ Use cloud storage or sync
 - ❌ Collect personal information
 - ❌ Use cookies or third-party trackers
 
 ### Data Storage:
-- **Local**: Analysis cache, user settings
-- **Cloud** (Optional): Scan history (only if signed in and enabled)
+- **Local Only**: Everything stored in `chrome.storage.local`
+- **Export/Import**: Backup via JSON files
+- **No Cloud**: No external storage or sync
 
 ---
 
@@ -476,6 +436,7 @@ Contributions welcome! Please:
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| **0.3.9** | Oct 30, 2025 | Chrome Web Store compliance, removed cloud services |
 | **0.3.8** | Oct 26, 2025 | Filter pills, enhanced history, UI improvements |
 | **0.3.7** | Oct 25, 2025 | Fixed addressbook display with auto-scan |
 | **0.3.6** | Oct 25, 2025 | Page/History tabs working, address highlighting fixed |
@@ -489,7 +450,3 @@ Contributions welcome! Please:
 | **0.1.0** | Oct 24, 2025 | Initial release with GoPlus & AI |
 
 **See `UPDATE_NOTES.md` for complete changelog**
-
-
-
-

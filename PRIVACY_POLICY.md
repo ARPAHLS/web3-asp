@@ -1,7 +1,7 @@
 # Privacy Policy for Web3 ASP (H3 Aspis)
 
-**Effective Date:** October 27, 2025  
-**Last Updated:** October 27, 2025
+**Effective Date:** October 30, 2025  
+**Last Updated:** October 30, 2025
 
 ## Overview
 
@@ -9,23 +9,15 @@ Web3 ASP (Agentic Security Protocol) is a privacy-first browser extension that p
 
 ## What Data We Collect
 
-### 1. **Local Storage Data (Always Collected)**
-Stored locally on your device only:
+### 1. **Local Storage Data Only**
+All data is stored locally on your device:
 - **Addressbook Entries:** Wallet addresses you save with custom tags/labels
 - **Scan History:** Previous security analysis results for reference
-- **User Settings:** Your preferences (auto-scan toggle, theme, etc.)
+- **User Settings:** Your preferences (auto-scan toggle, retention period, etc.)
 
-**This data never leaves your device unless you explicitly enable cloud backup.**
+**This data never leaves your device. No cloud storage, no accounts, no sync.**
 
-### 2. **Optional Cloud Backup Data (Only if You Sign In)**
-If you voluntarily create an account and sign in with Firebase:
-- **Email Address:** Used for authentication and account recovery
-- **Authentication Token:** Secure token to sync your data across devices
-- **Addressbook Backup:** Your saved contacts (synced to Firebase)
-
-**Signing in is completely optional. The extension works 100% without an account.**
-
-### 3. **Page Content Scanning**
+### 2. **Page Content Scanning**
 - We scan the text content of webpages to detect blockchain addresses (0x...)
 - **We do NOT store, transmit, or track:**
   - Your browsing history
@@ -41,7 +33,7 @@ Address detection happens **locally in your browser** and is never sent to our s
 - **Addressbook:** To help you identify and tag known wallet addresses
 - **Scan History:** To provide you with a record of previously analyzed addresses
 - **Settings:** To remember your preferences
-- **Authentication (if used):** To enable cloud backup and sync across devices
+- **Export/Import:** To backup and restore your data via JSON files
 
 ### Security Analysis API Calls:
 When analyzing addresses, we make HTTPS requests to:
@@ -67,39 +59,39 @@ These APIs only receive the blockchain address being analyzed, never your person
 ## Third-Party Services
 
 We use the following services:
-1. **Firebase (Google)** - Optional authentication and cloud backup
-   - [Firebase Privacy Policy](https://firebase.google.com/support/privacy)
-2. **GoPlus Labs API** - Token security analysis (public API, anonymous)
-3. **Blockchain RPC Providers** - On-chain data queries (public, anonymous)
-4. **Etherscan/Basescan/Polygonscan** - Contract verification (public APIs, anonymous)
+1. **GoPlus Labs API** - Token security analysis (public API, anonymous)
+2. **Blockchain RPC Providers** - On-chain data queries (public, anonymous)
+3. **Etherscan/Basescan/Polygonscan** - Contract verification (public APIs, anonymous)
 
-**None of these services receive your personal information or browsing history.**
+**These services only receive blockchain addresses for analysis. No personal information or browsing history is shared.**
 
 ## Data Retention
 
-- **Local Data:** Stored indefinitely on your device until you clear it via extension settings or browser data
-- **Cloud Data (if signed in):** Retained until you delete your account or manually clear data
-- **No automatic deletion** - you have full control
+- **Local Data:** Stored on your device until you clear it via extension settings or browser data
+- **Retention Policies:** You can set automatic deletion (1 week to 1 year, or never)
+- **Full Control:** You decide what data to keep and for how long
 
 ## Your Rights
 
 You have the right to:
 - ✅ **Access your data** - View all stored data in extension settings
-- ✅ **Delete your data** - Clear history, addressbook, or entire account anytime
+- ✅ **Delete your data** - Clear history or addressbook anytime
 - ✅ **Export your data** - Download your addressbook as JSON
-- ✅ **Opt out of cloud sync** - Use the extension entirely offline
+- ✅ **Import your data** - Restore from JSON backup files
 
-### How to Delete Your Data:
-1. **Local data:** Open extension → Settings → Clear History / Clear Addressbook
-2. **Account deletion:** Contact us at privacy@arpacorp.net to delete your Firebase account
+### How to Manage Your Data:
+1. **Clear History:** Open extension → Settings → Audit Trail → Clear All History
+2. **Clear Addressbook:** Open extension → Settings → My Addressbook → Delete individual entries
+3. **Export Data:** Settings → My Addressbook → Export (downloads JSON)
+4. **Import Data:** Settings → My Addressbook → Import (uploads JSON)
 
 ## Security
 
 We implement industry-standard security measures:
 - All data transmission uses HTTPS encryption
-- Firebase authentication tokens are securely managed by Google
-- Local data stored using Chrome's secure storage API
-- No passwords are stored by our extension (handled by Firebase)
+- Local data stored using Chrome's secure storage API (`chrome.storage.local`)
+- No passwords or authentication tokens stored
+- No cloud services or external databases
 
 ## Children's Privacy
 
@@ -116,10 +108,12 @@ This extension is open source. You can review the code at:
 
 ## Contact Us
 
-For privacy questions, data deletion requests, or concerns:
+For privacy questions or concerns:
 - **GitHub Issues:** https://github.com/arpahls/web3-asp/issues
 - **Email:** privacy@arpacorp.net
 - **Donation Address:** https://etherscan.io/address/0x14b16Ab34fB80f7Bdfd694394600898416a1821c
+
+**Note:** Since all data is stored locally, you have complete control and can delete it anytime without contacting us.
 
 ## Compliance
 
@@ -131,6 +125,6 @@ This extension complies with:
 ---
 
 **Built by ARPA Team**  
-**Version:** 0.3.8  
+**Version:** 0.3.9  
 **License:** MIT
 

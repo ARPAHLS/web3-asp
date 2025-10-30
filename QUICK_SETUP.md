@@ -8,15 +8,14 @@ Get Web3 ASP running in under 5 minutes with zero API keys!
 
 Works 100% offline!
 
-### Step 1: Copy Config Files
+### Step 1: Copy Config File
 
 ```bash
 # Copy the configuration template
 cp config.example.js config.js
-
-# Copy Firebase template (even if you won't use it)
-cp firebase-config.example.js firebase-config.js
 ```
+
+**That's all you need!** No other files required.
 
 ### Step 2: Configure config.js
 
@@ -27,7 +26,7 @@ features: {
   enableSanctionsCheck: true,   // ✅ Local database
   enableGoPlus: true,            // ✅ Free API, no key needed
   enableOnDeviceAI: true,        // ✅ Chrome Gemini Nano
-  enableFirebase: false,         // ❌ Disabled for offline use
+  enableHistory: true,           // ✅ Local history storage
   demoMode: true                 // ✅ All features unlocked
 }
 ```
@@ -146,18 +145,6 @@ rpc: {
 
 **Benefits**: Better reliability, higher rate limits, no throttling
 
-### Option 3: Enable Firebase (Cloud Sync)
-
-For cross-device history and settings sync:
-
-1. Create Firebase project at https://console.firebase.google.com/
-2. Enable Authentication (Google provider)
-3. Enable Firestore Database
-4. Copy Firebase config to `firebase-config.js`
-5. Set `enableFirebase: true` in `config.js`
-
-**Benefits**: Cloud history, cross-device sync, user authentication
-
 ---
 
 ## 🛡️ Privacy & Security
@@ -167,14 +154,15 @@ For cross-device history and settings sync:
 - ✅ Runs AI **entirely on your device** (Gemini Nano)
 - ✅ Checks sanctions **locally** (no external calls)
 - ✅ Only sends addresses to GoPlus API for threat intelligence (no personal data)
-- ✅ Stores addressbook and history **locally** by default
-- ✅ Firebase cloud sync is **opt-in** only
+- ✅ Stores addressbook and history **locally only**
+- ✅ Export/import via JSON files for backup
 
 ### What Web3 ASP Does NOT Do
 
 - ❌ Track your browsing history
+- ❌ Require accounts or logins
+- ❌ Use cloud storage or sync
 - ❌ Collect personal information
-- ❌ Send data to servers (unless you enable Firebase)
 - ❌ Use cookies or third-party trackers
 - ❌ Access your wallet or private keys
 
@@ -202,11 +190,6 @@ For cross-device history and settings sync:
 - Verify `enableGoPlus: true` in config
 - Check browser console for API errors
 
-### Firebase errors (if enabled)
-- Verify firebase-config.js is correctly filled out
-- Check Firebase console for auth/Firestore setup
-- Ensure `enableFirebase: true` in config.js
-
 ---
 
 ## 📊 Performance Tips
@@ -220,10 +203,10 @@ For cross-device history and settings sync:
 
 ### For Maximum Privacy
 
-1. **Disable Firebase**: Keep `enableFirebase: false`
+1. **Local-only mode**: Everything already stored locally
 2. **Use public RPCs**: No account/tracking required
 3. **Clear history**: Set short retention periods
-4. **Local-only mode**: Disable cloud features
+4. **Export data**: Backup via JSON files when needed
 
 ---
 
@@ -254,13 +237,13 @@ For cross-device history and settings sync:
 
 ## 💡 Pro Tips
 
-1. **Demo Mode** All features unlocked, no paywalls!
+1. **No accounts needed** - Everything works locally, no sign-ups!
 2. **Public RPCs** work great for testing, but consider private RPCs for production
 3. **Chrome AI** is optional but adds amazing context to security findings
-4. **Firebase** is completely optional - extension works 100% offline
-5. **Sanctions database** is updated regularly - pull latest from **[github.com/arpahls/web3-asp](https://github.com/arpahls/web3-asp)**
-6. **Filter pills** make it easy to find threats quickly - click multiple to combine filters
-7. **Addressbook tags** persist even when auto-scan is enabled
+4. **Sanctions database** is updated regularly - pull latest from **[github.com/arpahls/web3-asp](https://github.com/arpahls/web3-asp)**
+5. **Filter pills** make it easy to find threats quickly - click multiple to combine filters
+6. **Addressbook tags** persist even when auto-scan is enabled
+7. **Export/Import** - Use JSON backup for your addressbook and settings
 
 ---
 
@@ -272,12 +255,9 @@ For cross-device history and settings sync:
 - **Chrome Built-in AI**: https://developer.chrome.com/docs/ai/built-in
 - **Free RPC Providers**: https://chainlist.org/
 - **Etherscan API**: https://docs.etherscan.io/
-- **Firebase Setup**: https://firebase.google.com/docs/web/setup
 
 ---
 
 **Ready to go? Load the extension and start scanning!** 🛡️
 
 Questions? Check the main **[README.md](README.md)** or open an issue at **[github.com/arpahls/web3-asp/issues](https://github.com/arpahls/web3-asp/issues)**.
-
-

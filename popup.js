@@ -748,8 +748,8 @@ function setupSettingsTab() {
  * Handle authentication
  */
 async function handleAuth() {
-  // TODO: Implement Firebase auth with Google
-  showNotification('Authentication not yet implemented', 'info');
+  // Authentication removed - extension is fully local
+  showNotification('Extension runs locally, no login needed', 'info');
 }
 
 /**
@@ -825,18 +825,11 @@ function setupAddressbook() {
     }
   });
   
-  // Sync settings
+  // Sync settings (local only)
   syncSelect.addEventListener('change', async (e) => {
-    const syncMode = e.target.value;
-    
-    if (syncMode === 'cloud') {
-      showNotification('Cloud sync coming soon', 'info');
-      e.target.value = 'local';
-      return;
-    }
-    
-    await chrome.storage.local.set({ addressbookSync: syncMode });
-    showNotification('Sync setting saved', 'success');
+    // Force local storage only
+    await chrome.storage.local.set({ addressbookSync: 'local' });
+    showNotification('Using local storage', 'success');
   });
   
   // Export
@@ -1081,15 +1074,9 @@ function setupAuditTrail() {
   const retentionSelect = document.getElementById('retention-period-select');
   const clearHistoryBtn = document.getElementById('clear-history-btn');
   
-  // Storage setting
+  // Storage setting (local or none only)
   storageSelect.addEventListener('change', async (e) => {
     const storageMode = e.target.value;
-    
-    if (storageMode === 'cloud') {
-      showNotification('Cloud sync coming soon', 'info');
-      e.target.value = 'local';
-      return;
-    }
     
     if (storageMode === 'none') {
       if (!confirm('This will clear all existing history. Continue?')) {

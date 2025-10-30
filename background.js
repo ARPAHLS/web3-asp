@@ -29,7 +29,6 @@ const CONFIG = {
   // Feature flags
   features: {
     enableAI: true,
-    enableFirebase: false, // Will be configured later
     enableSanctionsCheck: true,
     enableGoPlus: true, // GoPlus token security API
     demoMode: true // All features publicly available for now
@@ -80,11 +79,6 @@ async function init() {
   
   // Setup message listeners
   chrome.runtime.onMessage.addListener(handleMessage);
-  
-  // Setup Firebase auth listener (if enabled)
-  if (CONFIG.features.enableFirebase) {
-    await setupFirebaseAuth();
-  }
   
   console.log('[H3 Aspis] Initialized successfully');
   console.log('[H3 Aspis] Demo mode:', CONFIG.features.demoMode);
@@ -599,7 +593,7 @@ async function runAIAnalysis(data) {
 }
 
 /**
- * Save analysis to history (local storage + optional Firebase sync)
+ * Save analysis to history (local storage only)
  */
 async function saveToHistory(address, result) {
   try {
@@ -627,18 +621,13 @@ async function saveToHistory(address, result) {
     
     console.log('[H3 Aspis] Saved to history:', address);
     
-    // If Firebase is enabled, also sync to cloud
-    if (CONFIG.features.enableFirebase && state.user.isAuthenticated) {
-      // TODO: Sync to Firebase
-    }
-    
   } catch (error) {
     console.error('[H3 Aspis] Error saving to history:', error);
   }
 }
 
 /**
- * Get history (local storage or Firebase)
+ * Get history from local storage
  */
 async function handleGetHistory(filters = {}) {
   try {
@@ -676,26 +665,6 @@ async function handleGetHistory(filters = {}) {
   }
 }
 
-/**
- * Setup Firebase authentication (optional)
- */
-async function setupFirebaseAuth() {
-  try {
-    console.log('[H3 Aspis] Firebase is disabled - using local storage only');
-    console.log('[H3 Aspis] To enable Firebase:');
-    console.log('[H3 Aspis]   1. Copy firebase-config.example.js to firebase-config.js');
-    console.log('[H3 Aspis]   2. Fill in your Firebase credentials');
-    console.log('[H3 Aspis]   3. Set enableFirebase: true in config.js');
-    
-    // Firebase is optional - extension works fine without it
-    return true;
-    
-  } catch (error) {
-    console.error('[H3 Aspis] Firebase setup error:', error);
-    // Don't fail if Firebase isn't configured
-    return false;
-  }
-}
 
 /**
  * Clear all scan history

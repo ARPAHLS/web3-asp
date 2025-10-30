@@ -1,14 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Web3 ASP: Agentic Security Protocol",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "description": "Privacy-first Web3 security analysis. Real-time smart contract and wallet screening powered by on-device AI.",
   
   "permissions": [
     "activeTab",
-    "scripting",
-    "storage",
-    "identity"
+    "storage"
   ],
   
   "host_permissions": [
@@ -48,7 +46,7 @@
   },
   
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com https://api.etherscan.io https://api.basescan.org https://api.polygonscan.com https://eth-mainnet.g.alchemy.com https://base-mainnet.g.alchemy.com https://polygon-mainnet.g.alchemy.com https://cloudflare-eth.com https://rpc.ankr.com https://api.gopluslabs.io;"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://api.etherscan.io https://api.basescan.org https://api.polygonscan.com https://eth-mainnet.g.alchemy.com https://base-mainnet.g.alchemy.com https://polygon-mainnet.g.alchemy.com https://cloudflare-eth.com https://rpc.ankr.com https://api.gopluslabs.io;"
   },
   
   "web_accessible_resources": [
@@ -56,10 +54,6 @@
       "resources": ["icons/*", "images/*"],
       "matches": ["<all_urls>"]
     }
-  ],
-  
-  "externally_connectable": {
-    "matches": ["https://*.firebaseapp.com/*", "https://*.web.app/*"]
-  }
+  ]
 }
 
