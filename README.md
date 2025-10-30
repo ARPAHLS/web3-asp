@@ -14,7 +14,7 @@ Web3 ASP (H3 Aspis) is a Chrome extension that provides real-time security analy
 
 ## 🛡️ Features
 
-### Core Features (v0.3.8)
+### Core Features (v0.3.9)
 - **Real-Time Address Detection**: Automatically scans web pages for Ethereum addresses
 - **Visual Security Indicators**: Color-coded highlighting (Green = Safe, Yellow = Warning, Red = Dangerous, Blue = Info, Purple = Addressbook)
 - **GoPlus Security API**: Real-time threat intelligence for honeypots, scams, and rug pulls
@@ -448,5 +448,6 @@ Contributions welcome! Please:
 | **0.3.0** | Oct 24, 2025 | Addressbook & audit trail UI complete |
 | **0.2.0** | Oct 24, 2025 | Multi-address support, sequential analysis |
 | **0.1.0** | Oct 24, 2025 | Initial release with GoPlus & AI |
+
 
 **See `UPDATE_NOTES.md` for complete changelog**
