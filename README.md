@@ -56,12 +56,19 @@ Web3 ASP (H3 Aspis) is a Chrome extension that provides real-time security analy
 
 ### ⚡ Quick Start (Zero Config!)
 
-**From Chrome Web Store:**
-https://chromewebstore.google.com/detail/kdnidamilegaknppnfglehffbpbpdjgo
+You have two ways to install the extension.
 
-or
+**1. From the Chrome Web Store (Recommended)**
 
-**Ready in 2 minutes:**
+Click the badge below to install directly from the official Chrome Web Store:
+
+[![Install from Chrome Web Store](https://storage.googleapis.com/chrome-gcs-prod/static/images/cws-button-horizontal.svg)](https://chromewebstore.google.com/detail/kdnidamilegaknppnfglehffbpbpdjgo)
+
+---
+
+**2. Manual Installation (Developer Mode)**
+
+If you prefer to install it manually (e.g., for development):
 
 1. **Clone or Download** this repository
 
@@ -456,4 +463,5 @@ Contributions welcome! Please:
 
 
 **See `UPDATE_NOTES.md` for complete changelog**
+
 
