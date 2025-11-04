@@ -62,7 +62,7 @@ You have two ways to install the extension.
 
 Click the badge below to install directly from the official Chrome Web Store:
 
-[![Install from Chrome Web Store](https://user-images.githubusercontent.com/3782760/126466228-68e148ea-f09c-48b0-96ac-5bf283e8707c.png)](https://chromewebstore.google.com/detail/kdnidamilegaknppnfglehffbpbpdjgo)
+[![Install from Chrome Web Store](./icons/chromefeb22.svg)](https://chromewebstore.google.com/detail/kdnidamilegaknppnfglehffbpbpdjgo)
 
 ---
 
@@ -463,6 +463,7 @@ Contributions welcome! Please:
 
 
 **See `UPDATE_NOTES.md` for complete changelog**
+
 
 
 
