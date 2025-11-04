@@ -62,7 +62,7 @@ You have two ways to install the extension.
 
 Click the badge below to install directly from the official Chrome Web Store:
 
-[![Install from Chrome Web Store](https://storage.googleapis.com/chrome-gcs-prod/static/images/cws-button-horizontal.svg)](https://chromewebstore.google.com/detail/kdnidamilegaknppnfglehffbpbpdjgo)
+[![Install from Chrome Web Store](https://raw.githubusercontent.com/it-bens/chrome-extension-developer-tools/main/src/images/chrome-web-store.png)](https://chromewebstore.google.com/detail/kdnidamilegaknppnfglehffbpbpdjgo)
 
 ---
 
@@ -463,5 +463,6 @@ Contributions welcome! Please:
 
 
 **See `UPDATE_NOTES.md` for complete changelog**
+
 
 
