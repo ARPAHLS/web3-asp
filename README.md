@@ -2,7 +2,7 @@
 
 > Privacy-first Web3 security analysis powered by on-device AI and real-time threat intelligence
 
-**Version**: 0.3.9 | **Status**: ✅ Production Ready | **Last Updated**: October 30, 2025
+**Version**: 0.3.9 | **Status**: Published on Chrome Web Store | **Last Updated**: October 30, 2025
 
 Web3 ASP (H3 Aspis) is a Chrome extension that provides real-time security analysis of smart contracts and wallet addresses as you browse the Web3. Using GoPlus Security API for threat detection and Google Chrome's built-in Gemini Nano AI for intelligent summaries, Web3 ASP is completely local-first with no cloud dependencies - protecting your privacy while keeping you safe.
 
@@ -55,6 +55,11 @@ Web3 ASP (H3 Aspis) is a Chrome extension that provides real-time security analy
 - **No account needed!** Everything runs locally
 
 ### ⚡ Quick Start (Zero Config!)
+
+**From Chrome Web Store:**
+https://chromewebstore.google.com/detail/kdnidamilegaknppnfglehffbpbpdjgo
+
+or
 
 **Ready in 2 minutes:**
 
@@ -451,3 +456,4 @@ Contributions welcome! Please:
 
 
 **See `UPDATE_NOTES.md` for complete changelog**
+
